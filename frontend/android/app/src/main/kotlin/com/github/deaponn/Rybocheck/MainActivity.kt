@@ -1,4 +1,4 @@
-package com.rybocheck.app.frontend
+package com.github.deaponn.Rybocheck
 
 import io.flutter.embedding.android.FlutterActivity
 

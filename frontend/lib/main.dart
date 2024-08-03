@@ -6,11 +6,11 @@ import 'package:Rybocheck/src/views/map.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Application());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Application extends StatelessWidget {
+  const Application({super.key});
 
   // This widget is the root of your application.
   @override
@@ -39,7 +39,7 @@ class _AppNavigationState extends State<AppNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Rybocheck")),
+      appBar: AppBar(title: const Text("Rybocheck")),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int newPageIndex) {
           setState(() {

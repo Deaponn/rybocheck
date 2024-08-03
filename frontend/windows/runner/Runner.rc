@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.rybocheck.app" "\0"
-            VALUE "FileDescription", "frontend" "\0"
+            VALUE "FileDescription", "Rybocheck" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "frontend" "\0"
+            VALUE "InternalName", "Rybocheck" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.rybocheck.app. All rights reserved." "\0"
-            VALUE "OriginalFilename", "frontend.exe" "\0"
-            VALUE "ProductName", "frontend" "\0"
+            VALUE "OriginalFilename", "Rybocheck.exe" "\0"
+            VALUE "ProductName", "Rybocheck" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

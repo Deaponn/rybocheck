@@ -1,6 +1,6 @@
 {
-    "name": "frontend",
-    "short_name": "frontend",
+    "name": "Rybocheck",
+    "short_name": "Rybocheck",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
