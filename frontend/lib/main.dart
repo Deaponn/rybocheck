@@ -1,9 +1,5 @@
-import 'package:Rybocheck/src/views/home.dart';
-import 'package:Rybocheck/src/views/new_post.dart';
-import 'package:Rybocheck/src/views/profile.dart';
-import 'package:Rybocheck/src/views/search.dart';
-import 'package:Rybocheck/src/views/map.dart';
 import 'package:flutter/material.dart';
+import 'package:Rybocheck/src/views/user/user_navigation.dart';
 
 void main() {
   runApp(const Application());
@@ -16,13 +12,12 @@ class Application extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Rybocheck',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const AppNavigation()
-    );
+        title: 'Rybocheck',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const AppNavigation());
   }
 }
 
@@ -39,29 +34,16 @@ class _AppNavigationState extends State<AppNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Rybocheck")),
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int newPageIndex) {
-          setState(() {
-            _currentPageIndex = newPageIndex;
-          });
-        },
-        selectedIndex: _currentPageIndex,
-        destinations: const <Widget>[
-          NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-          NavigationDestination(icon: Icon(Icons.search), label: "Search"),
-          NavigationDestination(icon: Icon(Icons.add_box), label: "Add new"),
-          NavigationDestination(icon: Icon(Icons.map), label: "Map"),
-          NavigationDestination(icon: Icon(Icons.person), label: "Profile")
-        ],
-      ),
-        body: <Widget>[
-          const Home(),
-          const Search(),
-          const NewPost(),
-          const Map(),
-          const Profile(),
-        ][_currentPageIndex]
-    );
+        appBar: userAppBar,
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (int newPageIndex) {
+            setState(() {
+              _currentPageIndex = newPageIndex;
+            });
+          },
+          selectedIndex: _currentPageIndex,
+          destinations: userDestinations,
+        ),
+        body: userViews[_currentPageIndex]);
   }
 }
