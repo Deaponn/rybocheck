@@ -1,49 +1,41 @@
+import 'package:Rybocheck/src/utils/allow_routes.dart';
+import 'package:Rybocheck/src/views/home.dart';
 import 'package:flutter/material.dart';
-import 'package:Rybocheck/src/views/user/user_navigation.dart';
+import 'package:go_router/go_router.dart';
 
-void main() {
-  runApp(const Application());
-}
+// void main() {
+//   runApp(const Application());
+// }
+
+void main() => runApp(const Application());
 
 class Application extends StatelessWidget {
   const Application({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    PermissionLevel permission = PermissionLevel.admin;
+    FullRouteData routeData = getFullRouteData(permission);
+
+    return MaterialApp.router(
         title: 'Rybocheck',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const AppNavigation());
+        routerConfig: router(routeData.routes));
   }
 }
 
-class AppNavigation extends StatefulWidget {
-  const AppNavigation({super.key});
-
-  @override
-  State<AppNavigation> createState() => _AppNavigationState();
-}
-
-class _AppNavigationState extends State<AppNavigation> {
-  int _currentPageIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: userAppBar,
-        bottomNavigationBar: NavigationBar(
-          onDestinationSelected: (int newPageIndex) {
-            setState(() {
-              _currentPageIndex = newPageIndex;
-            });
-          },
-          selectedIndex: _currentPageIndex,
-          destinations: userDestinations,
-        ),
-        body: userViews[_currentPageIndex]);
-  }
-}
+/// This handles '/' and '/details'.
+GoRouter Function(List<RouteBase>) router = (List<RouteBase> routes) {
+  return GoRouter(
+    routes: [
+      GoRoute(
+        path: '/rybocheck',
+        builder: (_, __) => const Home(),
+        routes: routes,
+      ),
+    ],
+  );
+};
