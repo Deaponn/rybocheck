@@ -19,12 +19,12 @@ PreferredSizeWidget Function(BuildContext) userAppBar = (BuildContext context) {
   ]);
 };
 
-List<Widget> userDestinations = <Widget>[
-  const NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-  const NavigationDestination(icon: Icon(Icons.search), label: "Search"),
-  const NavigationDestination(icon: Icon(Icons.add_box), label: "Add new"),
-  const NavigationDestination(icon: Icon(Icons.map), label: "Map"),
-  const NavigationDestination(icon: Icon(Icons.person), label: "Profile")
+List<BottomNavigationBarItem> userItems = <BottomNavigationBarItem>[
+  const BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+  const BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
+  const BottomNavigationBarItem(icon: Icon(Icons.add_box), label: "Add new"),
+  const BottomNavigationBarItem(icon: Icon(Icons.map), label: "Map"),
+  const BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile")
 ];
 
 List<Widget> userViews = <Widget>[

@@ -16,102 +16,40 @@ import 'package:Rybocheck/src/views/user/profile.dart';
 import 'package:Rybocheck/src/views/admin/admin_navigation.dart';
 
 typedef FullRouteData = ({
-  List<RouteBase> routes,
+  List<StatefulShellBranch> branches,
   PreferredSizeWidget Function(BuildContext) appBar,
-  List<Widget> destinations
+  List<BottomNavigationBarItem> items
 });
 
 enum PermissionLevel { admin, moderator, user, unauthenticated }
 
-List<RouteBase> baseRoutes = [
-  GoRoute(
-    path: 'rybocheck/home',
-    builder: (_, __) => const Home(),
-  ),
-  GoRoute(
-    path: 'rybocheck/search',
-    builder: (_, __) => const Search(),
-  ),
-  GoRoute(
-    path: 'rybocheck/map',
-    builder: (_, __) => const Map(),
-  ),
-  GoRoute(
-    path: 'rybocheck/settings',
-    builder: (_, __) => const Settings(),
-  )
-];
+List<StatefulShellBranch> unauthenticatedBranches = [authenticateBranch];
 
-List<RouteBase> adminRoutes = [
-  GoRoute(
-    path: 'rybocheck/admin-page',
-    builder: (_, __) => const AdminPage(),
-  ),
-  GoRoute(
-    path: 'rybocheck/profile',
-    builder: (_, __) => const Profile(),
-  ),
-];
+List<StatefulShellBranch> baseBranches = [homeBranch, searchBranch, mapBranch, settingsBranch];
 
-List<RouteBase> moderatorRoutes = [
-  GoRoute(
-    path: 'rybocheck/moderator-page',
-    builder: (_, __) => const ModeratorPage(),
-  ),
-  GoRoute(
-    path: 'rybocheck/profile',
-    builder: (_, __) => const Profile(),
-  ),
-];
+List<StatefulShellBranch> userBranches = [...baseBranches, profileBranch, newPostBranch];
 
-List<RouteBase> unauthenticatedRoutes = [
-  GoRoute(
-    path: 'rybocheck/login',
-    builder: (_, __) => const Authenticate(),
-  ),
-];
+List<StatefulShellBranch> moderatorBranches = [...userBranches, moderatorPageBranch];
 
-List<RouteBase> userRoutes = [
-  GoRoute(
-    path: 'rybocheck/profile',
-    builder: (_, __) => const Profile(),
-  ),
-  GoRoute(
-    path: 'rybocheck/new-post',
-    builder: (_, __) => const NewPost(),
-  ),
-];
+List<StatefulShellBranch> adminBranches = [...moderatorBranches, adminPageBranch];
 
 PermissionLevel Function(String) getPermissionLevel = (String jwt) {
   return PermissionLevel.admin;
 };
 
-FullRouteData Function(PermissionLevel) getFullRouteData =
-    (PermissionLevel permission) {
+FullRouteData Function(PermissionLevel) getFullRouteData = (PermissionLevel permission) {
   switch (permission) {
     case PermissionLevel.admin:
-      return (
-        routes: [...baseRoutes, ...adminRoutes],
-        appBar: adminAppBar,
-        destinations: adminDestinations
-      );
+      return (branches: [...baseBranches, ...adminBranches], appBar: adminAppBar, items: adminItems);
     case PermissionLevel.moderator:
-      return (
-        routes: [...baseRoutes, ...moderatorRoutes],
-        appBar: moderatorAppBar,
-        destinations: moderatorDestinations
-      );
+      return (branches: [...baseBranches, ...moderatorBranches], appBar: moderatorAppBar, items: moderatorItems);
     case PermissionLevel.user:
-      return (
-        routes: [...baseRoutes, ...userRoutes],
-        appBar: userAppBar,
-        destinations: userDestinations
-      );
+      return (branches: [...baseBranches, ...userBranches], appBar: userAppBar, items: userItems);
     case PermissionLevel.unauthenticated:
       return (
-        routes: [...baseRoutes, ...unauthenticatedRoutes],
+        branches: [...baseBranches, ...unauthenticatedBranches],
         appBar: unauthenticatedAppBar,
-        destinations: unauthenticatedDestinations
+        items: unauthenticatedItems
       );
   }
 };
