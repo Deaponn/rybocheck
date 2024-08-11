@@ -4,8 +4,7 @@ import 'package:Rybocheck/src/views/home.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 void main() => runApp(const Application());
 
@@ -137,18 +136,18 @@ class _ApplicationState extends State<Application> {
   PermissionLevel permission = PermissionLevel.unauthenticated;
   FullRouteData routeData = getFullRouteData(PermissionLevel.unauthenticated);
 
-  late final ValueNotifier<RoutingConfig> myRoutingConfig =
-      ValueNotifier<RoutingConfig>(
+  late final ValueNotifier<RoutingConfig> myRoutingConfig = ValueNotifier<RoutingConfig>(
     RoutingConfig(
       routes: <RouteBase>[
-        StatefulShellRoute.indexedStack(builder: (BuildContext context, GoRouterState state,
-            StatefulNavigationShell navigationShell) {
-          // Return the widget that implements the custom shell (in this case
-          // using a BottomNavigationBar). The StatefulNavigationShell is passed
-          // to be able access the state of the shell and to navigate to other
-          // branches in a stateful way.
-          return MainScaffold(navigationShell: navigationShell, appBar: routeData.appBar, items: routeData.items);
-        }, branches: routeData.branches)
+        StatefulShellRoute.indexedStack(
+            builder: (BuildContext context, GoRouterState state, StatefulNavigationShell navigationShell) {
+              // Return the widget that implements the custom shell (in this case
+              // using a BottomNavigationBar). The StatefulNavigationShell is passed
+              // to be able access the state of the shell and to navigate to other
+              // branches in a stateful way.
+              return MainScaffold(navigationShell: navigationShell, appBar: routeData.appBar, destinations: routeData.destinations);
+            },
+            branches: routeData.branches)
       ],
     ),
   );

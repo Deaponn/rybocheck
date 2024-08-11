@@ -18,14 +18,14 @@ import 'package:Rybocheck/src/views/admin/admin_navigation.dart';
 typedef FullRouteData = ({
   List<StatefulShellBranch> branches,
   PreferredSizeWidget Function(BuildContext) appBar,
-  List<BottomNavigationBarItem> items
+  List<NavigationDestination> destinations
 });
 
 enum PermissionLevel { admin, moderator, user, unauthenticated }
 
-List<StatefulShellBranch> unauthenticatedBranches = [authenticateBranch];
-
 List<StatefulShellBranch> baseBranches = [homeBranch, searchBranch, mapBranch, settingsBranch];
+
+List<StatefulShellBranch> unauthenticatedBranches = [...baseBranches, authenticateBranch];
 
 List<StatefulShellBranch> userBranches = [...baseBranches, profileBranch, newPostBranch];
 
@@ -40,16 +40,16 @@ PermissionLevel Function(String) getPermissionLevel = (String jwt) {
 FullRouteData Function(PermissionLevel) getFullRouteData = (PermissionLevel permission) {
   switch (permission) {
     case PermissionLevel.admin:
-      return (branches: [...baseBranches, ...adminBranches], appBar: adminAppBar, items: adminItems);
+      return (branches: adminBranches, appBar: adminAppBar, destinations: adminDestinations);
     case PermissionLevel.moderator:
-      return (branches: [...baseBranches, ...moderatorBranches], appBar: moderatorAppBar, items: moderatorItems);
+      return (branches: moderatorBranches, appBar: moderatorAppBar, destinations: moderatorDestinations);
     case PermissionLevel.user:
-      return (branches: [...baseBranches, ...userBranches], appBar: userAppBar, items: userItems);
+      return (branches: userBranches, appBar: userAppBar, destinations: userDestinations);
     case PermissionLevel.unauthenticated:
       return (
-        branches: [...baseBranches, ...unauthenticatedBranches],
+        branches: unauthenticatedBranches,
         appBar: unauthenticatedAppBar,
-        items: unauthenticatedItems
+        destinations: unauthenticatedDestinations
       );
   }
 };

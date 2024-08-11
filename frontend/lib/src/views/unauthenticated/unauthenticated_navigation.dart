@@ -17,11 +17,11 @@ PreferredSizeWidget Function(BuildContext) unauthenticatedAppBar = (BuildContext
   ]);
 };
 
-List<BottomNavigationBarItem> unauthenticatedItems = <BottomNavigationBarItem>[
-  const BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-  const BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
-  const BottomNavigationBarItem(icon: Icon(Icons.map), label: "Map"),
-  const BottomNavigationBarItem(icon: Icon(Icons.login), label: "Login")
+List<NavigationDestination> unauthenticatedDestinations = <NavigationDestination>[
+  const NavigationDestination(icon: Icon(Icons.home), label: "Home"),
+  const NavigationDestination(icon: Icon(Icons.search), label: "Search"),
+  const NavigationDestination(icon: Icon(Icons.map), label: "Map"),
+  const NavigationDestination(icon: Icon(Icons.login), label: "Login")
 ];
 
 List<Widget> unauthenticatedViews = <Widget>[

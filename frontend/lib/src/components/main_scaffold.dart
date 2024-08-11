@@ -5,24 +5,23 @@ class MainScaffold extends StatelessWidget {
   const MainScaffold({
     required this.navigationShell,
     required this.appBar,
-    required this.items,
+    required this.destinations,
     Key? key,
   }) : super(key: key ?? const ValueKey<String>('ScaffoldWithNavBar'));
 
   final StatefulNavigationShell navigationShell;
   final PreferredSizeWidget Function(BuildContext) appBar;
-  final List<BottomNavigationBarItem> items;
+  final List<NavigationDestination> destinations;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(context),
       body: navigationShell,
-      bottomNavigationBar: BottomNavigationBar(
-        selectedIconTheme: const IconThemeData(color: Color.fromRGBO(0, 0, 0, 1)),
-        items: items,
-        currentIndex: navigationShell.currentIndex,
-        onTap: (int index) => _onTap(context, index),
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: (int newPageIndex) => _onTap(context, newPageIndex),
+        selectedIndex: navigationShell.currentIndex,
+        destinations: destinations,
       ),
     );
   }
