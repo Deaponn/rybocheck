@@ -12,5 +12,7 @@ class ModeratorPage extends StatelessWidget {
 
 StatefulShellBranch moderatorPageBranch = StatefulShellBranch(routes: [
   GoRoute(
-      path: '/rybocheck/moderator-page', builder: (BuildContext context, GoRouterState state) => const ModeratorPage()),
+      path: '/rybocheck/moderator-page',
+      name: 'moderator-page',
+      builder: (BuildContext context, GoRouterState state) => const ModeratorPage()),
 ]);

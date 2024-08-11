@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+List<String> _hideAppBarAndNavigation = ["/rybocheck/settings", "/rybocheck/moderator-page", "/rybocheck/admin-page"];
+
 class MainScaffold extends StatelessWidget {
   const MainScaffold({
+    required this.routerState,
     required this.navigationShell,
     required this.appBar,
     required this.destinations,
     Key? key,
   }) : super(key: key ?? const ValueKey<String>('ScaffoldWithNavBar'));
 
+  final GoRouterState routerState;
   final StatefulNavigationShell navigationShell;
   final PreferredSizeWidget Function(BuildContext) appBar;
   final List<NavigationDestination> destinations;
@@ -16,13 +20,13 @@ class MainScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(context),
+      appBar: _hideAppBarAndNavigation.contains(routerState.fullPath) ? null : appBar(context),
       body: navigationShell,
-      bottomNavigationBar: navigationShell.currentIndex < destinations.length ? NavigationBar(
+      bottomNavigationBar: _hideAppBarAndNavigation.contains(routerState.fullPath) ? null : NavigationBar(
         onDestinationSelected: (int newPageIndex) => _onTap(context, newPageIndex),
         selectedIndex: navigationShell.currentIndex,
         destinations: destinations,
-      ) : null,
+      ),
     );
   }
 

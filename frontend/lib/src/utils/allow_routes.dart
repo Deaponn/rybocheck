@@ -33,7 +33,7 @@ PreferredSizeWidget Function(BuildContext) unauthenticatedAppBar = (BuildContext
       icon: const Icon(Icons.settings),
       tooltip: 'Settings',
       onPressed: () {
-        GoRouter.of(context).go('/rybocheck/settings');
+        GoRouter.of(context).pushNamed('settings');
       },
     ),
   ]);
@@ -52,7 +52,7 @@ List<StatefulShellBranch> userBranches = [
   newPostBranch,
   mapBranch,
   profileBranch,
-  settingsBranch
+  settingsBranch,
 ];
 
 PreferredSizeWidget Function(BuildContext) userAppBar = (BuildContext context) {
@@ -61,7 +61,7 @@ PreferredSizeWidget Function(BuildContext) userAppBar = (BuildContext context) {
       icon: const Icon(Icons.settings),
       tooltip: 'Settings',
       onPressed: () {
-        GoRouter.of(context).go('/rybocheck/settings');
+        GoRouter.of(context).pushNamed('settings');
       },
     ),
   ]);
@@ -83,14 +83,14 @@ PreferredSizeWidget Function(BuildContext) moderatorAppBar = (BuildContext conte
       icon: const Icon(Icons.list_alt),
       tooltip: 'Moderator page',
       onPressed: () {
-        GoRouter.of(context).go('/rybocheck/moderator-page');
+        GoRouter.of(context).pushNamed('moderator-page');
       },
     ),
     IconButton(
       icon: const Icon(Icons.settings),
       tooltip: 'Settings',
       onPressed: () {
-        GoRouter.of(context).go('/rybocheck/settings');
+        GoRouter.of(context).pushNamed('settings');
       },
     ),
   ]);
@@ -112,14 +112,14 @@ PreferredSizeWidget Function(BuildContext) adminAppBar = (BuildContext context) 
       icon: const Icon(Icons.list_alt),
       tooltip: 'Admin page',
       onPressed: () {
-        GoRouter.of(context).go('/rybocheck/admin-page');
+        GoRouter.of(context).pushNamed('admin-page');
       },
     ),
     IconButton(
       icon: const Icon(Icons.settings),
       tooltip: 'Settings',
       onPressed: () {
-        GoRouter.of(context).go('/rybocheck/settings');
+        GoRouter.of(context).pushNamed('settings');
       },
     ),
   ]);
