@@ -18,11 +18,11 @@ class MainScaffold extends StatelessWidget {
     return Scaffold(
       appBar: appBar(context),
       body: navigationShell,
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: navigationShell.currentIndex < destinations.length ? NavigationBar(
         onDestinationSelected: (int newPageIndex) => _onTap(context, newPageIndex),
         selectedIndex: navigationShell.currentIndex,
         destinations: destinations,
-      ),
+      ) : null,
     );
   }
 

@@ -1,6 +1,3 @@
-import 'package:Rybocheck/src/views/moderator/moderator_navigation.dart';
-import 'package:Rybocheck/src/views/unauthenticated/unauthenticated_navigation.dart';
-import 'package:Rybocheck/src/views/user/user_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,7 +10,6 @@ import 'package:Rybocheck/src/views/moderator/moderator_page.dart';
 import 'package:Rybocheck/src/views/unauthenticated/authenticate.dart';
 import 'package:Rybocheck/src/views/user/new_post.dart';
 import 'package:Rybocheck/src/views/user/profile.dart';
-import 'package:Rybocheck/src/views/admin/admin_navigation.dart';
 
 typedef FullRouteData = ({
   List<StatefulShellBranch> branches,
@@ -23,15 +19,119 @@ typedef FullRouteData = ({
 
 enum PermissionLevel { admin, moderator, user, unauthenticated }
 
-List<StatefulShellBranch> baseBranches = [homeBranch, searchBranch, mapBranch, settingsBranch];
+List<StatefulShellBranch> unauthenticatedBranches = [
+  homeBranch,
+  searchBranch,
+  mapBranch,
+  authenticateBranch,
+  settingsBranch
+];
 
-List<StatefulShellBranch> unauthenticatedBranches = [...baseBranches, authenticateBranch];
+PreferredSizeWidget Function(BuildContext) unauthenticatedAppBar = (BuildContext context) {
+  return AppBar(title: const Text("Rybocheck"), actions: <Widget>[
+    IconButton(
+      icon: const Icon(Icons.settings),
+      tooltip: 'Settings',
+      onPressed: () {
+        GoRouter.of(context).go('/rybocheck/settings');
+      },
+    ),
+  ]);
+};
 
-List<StatefulShellBranch> userBranches = [...baseBranches, profileBranch, newPostBranch];
+List<NavigationDestination> unauthenticatedDestinations = <NavigationDestination>[
+  const NavigationDestination(icon: Icon(Icons.home), label: "Home"),
+  const NavigationDestination(icon: Icon(Icons.search), label: "Search"),
+  const NavigationDestination(icon: Icon(Icons.map), label: "Map"),
+  const NavigationDestination(icon: Icon(Icons.login), label: "Login")
+];
+
+List<StatefulShellBranch> userBranches = [
+  homeBranch,
+  searchBranch,
+  newPostBranch,
+  mapBranch,
+  profileBranch,
+  settingsBranch
+];
+
+PreferredSizeWidget Function(BuildContext) userAppBar = (BuildContext context) {
+  return AppBar(title: const Text("Rybocheck"), actions: <Widget>[
+    IconButton(
+      icon: const Icon(Icons.settings),
+      tooltip: 'Settings',
+      onPressed: () {
+        GoRouter.of(context).go('/rybocheck/settings');
+      },
+    ),
+  ]);
+};
+
+List<NavigationDestination> userDestinations = <NavigationDestination>[
+  const NavigationDestination(icon: Icon(Icons.home), label: "Home"),
+  const NavigationDestination(icon: Icon(Icons.search), label: "Search"),
+  const NavigationDestination(icon: Icon(Icons.add_box), label: "Add new"),
+  const NavigationDestination(icon: Icon(Icons.map), label: "Map"),
+  const NavigationDestination(icon: Icon(Icons.person), label: "Profile")
+];
 
 List<StatefulShellBranch> moderatorBranches = [...userBranches, moderatorPageBranch];
 
+PreferredSizeWidget Function(BuildContext) moderatorAppBar = (BuildContext context) {
+  return AppBar(title: const Text("Rybocheck"), actions: <Widget>[
+    IconButton(
+      icon: const Icon(Icons.list_alt),
+      tooltip: 'Moderator page',
+      onPressed: () {
+        GoRouter.of(context).go('/rybocheck/moderator-page');
+      },
+    ),
+    IconButton(
+      icon: const Icon(Icons.settings),
+      tooltip: 'Settings',
+      onPressed: () {
+        GoRouter.of(context).go('/rybocheck/settings');
+      },
+    ),
+  ]);
+};
+
+List<NavigationDestination> moderatorDestinations = <NavigationDestination>[
+  const NavigationDestination(icon: Icon(Icons.home), label: "Home"),
+  const NavigationDestination(icon: Icon(Icons.search), label: "Search"),
+  const NavigationDestination(icon: Icon(Icons.add_box), label: "Add new"),
+  const NavigationDestination(icon: Icon(Icons.map), label: "Map"),
+  const NavigationDestination(icon: Icon(Icons.person), label: "Profile")
+];
+
 List<StatefulShellBranch> adminBranches = [...moderatorBranches, adminPageBranch];
+
+PreferredSizeWidget Function(BuildContext) adminAppBar = (BuildContext context) {
+  return AppBar(title: const Text("Rybocheck"), actions: <Widget>[
+    IconButton(
+      icon: const Icon(Icons.list_alt),
+      tooltip: 'Admin page',
+      onPressed: () {
+        GoRouter.of(context).go('/rybocheck/admin-page');
+      },
+    ),
+    IconButton(
+      icon: const Icon(Icons.settings),
+      tooltip: 'Settings',
+      onPressed: () {
+        GoRouter.of(context).go('/rybocheck/settings');
+      },
+    ),
+  ]);
+};
+
+List<NavigationDestination> adminDestinations = <NavigationDestination>[
+  const NavigationDestination(icon: Icon(Icons.home), label: "Home"),
+  const NavigationDestination(icon: Icon(Icons.search), label: "Search"),
+  const NavigationDestination(icon: Icon(Icons.add_box), label: "Add new"),
+  const NavigationDestination(icon: Icon(Icons.map), label: "Map"),
+  const NavigationDestination(icon: Icon(Icons.person), label: "Profile")
+];
 
 PermissionLevel Function(String) getPermissionLevel = (String jwt) {
   return PermissionLevel.admin;

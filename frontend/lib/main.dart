@@ -145,7 +145,8 @@ class _ApplicationState extends State<Application> {
               // using a BottomNavigationBar). The StatefulNavigationShell is passed
               // to be able access the state of the shell and to navigate to other
               // branches in a stateful way.
-              return MainScaffold(navigationShell: navigationShell, appBar: routeData.appBar, destinations: routeData.destinations);
+              return MainScaffold(
+                  navigationShell: navigationShell, appBar: routeData.appBar, destinations: routeData.destinations);
             },
             branches: routeData.branches)
       ],
