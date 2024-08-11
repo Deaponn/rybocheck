@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:Rybocheck/src/views/home.dart';
@@ -14,7 +15,7 @@ import 'package:Rybocheck/src/views/user/profile.dart';
 typedef FullRouteData = ({
   List<StatefulShellBranch> branches,
   PreferredSizeWidget Function(BuildContext) appBar,
-  List<NavigationDestination> destinations
+  List<NavigationDestination> Function(BuildContext) destinations
 });
 
 enum PermissionLevel { admin, moderator, user, unauthenticated }
@@ -39,11 +40,11 @@ PreferredSizeWidget Function(BuildContext) unauthenticatedAppBar = (BuildContext
   ]);
 };
 
-List<NavigationDestination> unauthenticatedDestinations = <NavigationDestination>[
-  const NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-  const NavigationDestination(icon: Icon(Icons.search), label: "Search"),
-  const NavigationDestination(icon: Icon(Icons.map), label: "Map"),
-  const NavigationDestination(icon: Icon(Icons.login), label: "Login")
+List<NavigationDestination> Function(BuildContext) unauthenticatedDestinations = (context) => <NavigationDestination>[
+  NavigationDestination(icon: const Icon(Icons.home), label: AppLocalizations.of(context)!.navBarHome),
+  NavigationDestination(icon: const Icon(Icons.search), label: AppLocalizations.of(context)!.navBarSearch),
+  NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarMap),
+  NavigationDestination(icon: const Icon(Icons.login), label: AppLocalizations.of(context)!.navBarLogin)
 ];
 
 List<StatefulShellBranch> userBranches = [
@@ -67,12 +68,12 @@ PreferredSizeWidget Function(BuildContext) userAppBar = (BuildContext context) {
   ]);
 };
 
-List<NavigationDestination> userDestinations = <NavigationDestination>[
-  const NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-  const NavigationDestination(icon: Icon(Icons.search), label: "Search"),
-  const NavigationDestination(icon: Icon(Icons.add_box), label: "Add new"),
-  const NavigationDestination(icon: Icon(Icons.map), label: "Map"),
-  const NavigationDestination(icon: Icon(Icons.person), label: "Profile")
+List<NavigationDestination> Function(BuildContext) userDestinations = (context) => <NavigationDestination>[
+  NavigationDestination(icon: const Icon(Icons.home), label: AppLocalizations.of(context)!.navBarHome),
+  NavigationDestination(icon: const Icon(Icons.search), label: AppLocalizations.of(context)!.navBarSearch),
+  NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarNewPost),
+  NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarMap),
+  NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarProfile),
 ];
 
 List<StatefulShellBranch> moderatorBranches = [...userBranches, moderatorPageBranch];
@@ -96,13 +97,7 @@ PreferredSizeWidget Function(BuildContext) moderatorAppBar = (BuildContext conte
   ]);
 };
 
-List<NavigationDestination> moderatorDestinations = <NavigationDestination>[
-  const NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-  const NavigationDestination(icon: Icon(Icons.search), label: "Search"),
-  const NavigationDestination(icon: Icon(Icons.add_box), label: "Add new"),
-  const NavigationDestination(icon: Icon(Icons.map), label: "Map"),
-  const NavigationDestination(icon: Icon(Icons.person), label: "Profile")
-];
+List<NavigationDestination> Function(BuildContext) moderatorDestinations = userDestinations;
 
 List<StatefulShellBranch> adminBranches = [...moderatorBranches, adminPageBranch];
 
@@ -125,13 +120,7 @@ PreferredSizeWidget Function(BuildContext) adminAppBar = (BuildContext context) 
   ]);
 };
 
-List<NavigationDestination> adminDestinations = <NavigationDestination>[
-  const NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-  const NavigationDestination(icon: Icon(Icons.search), label: "Search"),
-  const NavigationDestination(icon: Icon(Icons.add_box), label: "Add new"),
-  const NavigationDestination(icon: Icon(Icons.map), label: "Map"),
-  const NavigationDestination(icon: Icon(Icons.person), label: "Profile")
-];
+List<NavigationDestination> Function(BuildContext) adminDestinations = moderatorDestinations;
 
 PermissionLevel Function(String) getPermissionLevel = (String jwt) {
   return PermissionLevel.admin;

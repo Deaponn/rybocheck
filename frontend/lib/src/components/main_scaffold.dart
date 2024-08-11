@@ -14,13 +14,13 @@ class MainScaffold extends StatelessWidget {
 
   final GoRouterState routerState;
   final StatefulNavigationShell navigationShell;
-  final PreferredSizeWidget Function(BuildContext) appBar;
+  final PreferredSizeWidget appBar;
   final List<NavigationDestination> destinations;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _hideAppBarAndNavigation.contains(routerState.fullPath) ? null : appBar(context),
+      appBar: _hideAppBarAndNavigation.contains(routerState.fullPath) ? null : appBar,
       body: navigationShell,
       bottomNavigationBar: _hideAppBarAndNavigation.contains(routerState.fullPath) ? null : NavigationBar(
         onDestinationSelected: (int newPageIndex) => _onTap(context, newPageIndex),

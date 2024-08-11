@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:Rybocheck/src/components/main_scaffold.dart';
 import 'package:Rybocheck/src/utils/allow_routes.dart';
 
@@ -27,8 +30,8 @@ class _ApplicationState extends State<Application> {
             return MainScaffold(
                 routerState: state,
                 navigationShell: navigationShell,
-                appBar: routeData.appBar,
-                destinations: routeData.destinations);
+                appBar: routeData.appBar(context),
+                destinations: routeData.destinations(context));
           },
           branches: routeData.branches),
     ]),
@@ -47,6 +50,16 @@ class _ApplicationState extends State<Application> {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'), // English
+          Locale('pl'), // Polish
+        ],
         routerConfig: router);
   }
 }

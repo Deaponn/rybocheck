@@ -1,0 +1,13 @@
+{
+    "@@locale": "en",
+
+    "navBarHome": "Home",
+    "navBarSearch": "Search",
+    "navBarNewPost": "New post",
+    "navBarMap": "Map",
+    "navBarLogin": "Login",
+    "navBarProfile": "Profile",
+
+    "loginSwitchLogin": "Login",
+    "loginSwitchRegister": "Register"
+}

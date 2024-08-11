@@ -1,0 +1,13 @@
+{
+    "@@locale": "pl",
+
+    "navBarHome": "Główna",
+    "navBarSearch": "Szukaj",
+    "navBarNewPost": "Nowy wpis",
+    "navBarMap": "Mapa",
+    "navBarLogin": "Logowanie",
+    "navBarProfile": "Profil",
+
+    "loginSwitchLogin": "Logowanie",
+    "loginSwitchRegister": "Rejestracja"
+}
