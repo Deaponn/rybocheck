@@ -9,5 +9,15 @@
     "navBarProfile": "Profile",
 
     "loginSwitchLogin": "Login",
-    "loginSwitchRegister": "Register"
+    "loginSwitchRegister": "Register",
+    "loginLoginButton": "Login",
+    "loginRegisterButton": "Register",
+    "loginLoginPendingToast": "Logging in...",
+    "loginRegisterPendingToast": "Registering...",
+    "loginUsernameValidation": "Please enter your username",
+    "loginPasswordValidation": "Please enter your password",
+    "loginConfirmPasswordValidation": "Please confirm your password",
+    "loginPasswordsDontMatch": "Passwords do not match",
+    "loginUsernamePlaceholder": "your username...",
+    "loginPasswordPlaceholder": "your password..."
 }

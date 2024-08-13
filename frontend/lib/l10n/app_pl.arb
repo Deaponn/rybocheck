@@ -9,5 +9,15 @@
     "navBarProfile": "Profil",
 
     "loginSwitchLogin": "Logowanie",
-    "loginSwitchRegister": "Rejestracja"
+    "loginSwitchRegister": "Rejestracja",
+    "loginLoginButton": "Zaloguj",
+    "loginRegisterButton": "Zarejestruj",
+    "loginLoginPendingToast": "Logowanie...",
+    "loginRegisterPendingToast": "Rejestracja...",
+    "loginUsernameValidation": "Proszę podać nazwę użytkownika",
+    "loginPasswordValidation": "Proszę podać hasło",
+    "loginConfirmPasswordValidation": "Proszę powtórzyć hasło",
+    "loginPasswordsDontMatch": "Hasła nie są takie same",
+    "loginUsernamePlaceholder": "twój login...",
+    "loginPasswordPlaceholder": "twoje hasło..."
 }
