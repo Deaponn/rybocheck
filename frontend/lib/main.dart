@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -6,7 +9,14 @@ import 'package:go_router/go_router.dart';
 import 'package:Rybocheck/src/components/main_scaffold.dart';
 import 'package:Rybocheck/src/utils/allow_routes.dart';
 
-void main() => runApp(const Application());
+// DotEnv dotenv = DotEnv() is automatically called during import.
+// If you want to load multiple dotenv files or name your dotenv object differently, you can do the following and import the singleton into the relavant files:
+// DotEnv another_dotenv = DotEnv()
+
+Future main() async {
+  await dotenv.load(fileName: "dev.env", mergeWith: Platform.environment);
+  runApp(const Application());
+}
 
 class Application extends StatefulWidget {
   const Application({super.key});

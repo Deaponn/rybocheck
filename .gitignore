@@ -1,6 +1,9 @@
 # Rust server
 backend/target
 
+dev.env
+prod.env
+
 # Miscellaneous
 *.class
 *.lock
