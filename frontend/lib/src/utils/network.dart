@@ -1,22 +1,45 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
-import 'package:fargon2/fargon2.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:Rybocheck/src/utils/encryption.dart';
 
-Future<http.Response> login(String username, String password) async {
-  final hashedPassword = await const Fargon2(mode: Fargon2Mode.argon2id).hash(
-    passphrase: 'mypassphrase',
-    salt: username + dotenv.env['CLIENT_PEPPER']!,
-    hashLength: 16,
-    iterations: 3,
-    parallelism: 1,
-    memoryKibibytes: 12288,
-  );
+typedef ServerResponse<T> = ({T? responseBody, String status, String? error});
 
-  final String apiUrl = dotenv.env['CLIENT_PEPPER']!;
+typedef AuthResponse = ({JwtTokenPair? tokens, String status, String? error});
 
-  return http.get(Uri.parse('https://$apiUrl/login'));
+Future<T> postRequest<T>(String path, Object body) async {
+  final String apiUrl = dotenv.env['API_URL']!;
+
+  final response = await http.post(Uri.parse('https://$apiUrl/$path'), body: body);
+
+  return jsonDecode(response.body) as T;
 }
 
-Future<http.Response> fetchAlbum() {
-  return http.get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
+Future<AuthResponse> login(String username, String password) async {
+  final hashedPassword = hashPassword(username, password);
+
+  final result =
+      await postRequest<ServerResponse<JwtTokenPair>>("login", {username: username, hashedPassword: hashedPassword});
+
+  print(result);
+
+  if (result.status == "success") {
+    return (tokens: result.responseBody!, status: result.status, error: null);
+  } else {
+    return (error: result.error!, status: result.status, tokens: null);
+  }
+}
+
+Future<AuthResponse> register(String username, String password, [String? email, String? phoneNumber]) async {
+  final hashedPassword = hashPassword(username, password);
+
+  final result = await postRequest<ServerResponse<JwtTokenPair>>(
+      "register", {username: username, hashedPassword: hashedPassword, email: email, phoneNumber: phoneNumber});
+
+  if (result.status == "success") {
+    return (tokens: result.responseBody!, status: result.status, error: null);
+  } else {
+    return (error: result.error!, status: result.status, tokens: null);
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:Rybocheck/src/utils/network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -19,6 +20,35 @@ class _AuthenticateState extends State<Authenticate> {
 
   @override
   Widget build(BuildContext context) {
+    String username = "";
+    String password = "";
+
+    final usernameField = TextFormField(
+      onSaved: (value) => username = value!,
+      autocorrect: false,
+      decoration: InputDecoration(labelText: AppLocalizations.of(context)!.loginUsernamePlaceholder),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return AppLocalizations.of(context)!.loginUsernameValidation;
+        }
+        return null;
+      },
+    );
+
+    final passwordField = TextFormField(
+      onSaved: (value) => password = value!,
+      autocorrect: false,
+      decoration: InputDecoration(labelText: AppLocalizations.of(context)!.loginPasswordPlaceholder),
+      controller: _passwordController,
+      obscureText: true,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return AppLocalizations.of(context)!.loginPasswordValidation;
+        }
+        return null;
+      },
+    );
+
     return Column(
       children: [
         TextSwitch(
@@ -36,27 +66,8 @@ class _AuthenticateState extends State<Authenticate> {
                   key: _loginFormKey,
                   child: Column(
                     children: <Widget>[
-                      TextFormField(
-                        autocorrect: false,
-                        decoration: InputDecoration(labelText: AppLocalizations.of(context)!.loginUsernamePlaceholder),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return AppLocalizations.of(context)!.loginUsernameValidation;
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        autocorrect: false,
-                        decoration: InputDecoration(labelText: AppLocalizations.of(context)!.loginPasswordPlaceholder),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return AppLocalizations.of(context)!.loginPasswordValidation;
-                          }
-                          return null;
-                        },
-                      ),
+                      usernameField,
+                      passwordField,
                       ElevatedButton(
                         onPressed: () {
                           // Validate returns true if the form is valid, or false otherwise.
@@ -66,6 +77,8 @@ class _AuthenticateState extends State<Authenticate> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(AppLocalizations.of(context)!.loginLoginPendingToast)),
                             );
+                            _loginFormKey.currentState!.save();
+                            login(username, password);
                           }
                         },
                         child: Text(AppLocalizations.of(context)!.loginLoginButton),
@@ -77,28 +90,8 @@ class _AuthenticateState extends State<Authenticate> {
                   key: _registerFormKey,
                   child: Column(
                     children: <Widget>[
-                      TextFormField(
-                        autocorrect: false,
-                        decoration: InputDecoration(labelText: AppLocalizations.of(context)!.loginUsernamePlaceholder),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return AppLocalizations.of(context)!.loginUsernameValidation;
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        autocorrect: false,
-                        decoration: InputDecoration(labelText: AppLocalizations.of(context)!.loginPasswordPlaceholder),
-                        controller: _passwordController,
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return AppLocalizations.of(context)!.loginPasswordValidation;
-                          }
-                          return null;
-                        },
-                      ),
+                      usernameField,
+                      passwordField,
                       TextFormField(
                         autocorrect: false,
                         decoration: InputDecoration(labelText: AppLocalizations.of(context)!.loginPasswordPlaceholder),
@@ -122,6 +115,7 @@ class _AuthenticateState extends State<Authenticate> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(AppLocalizations.of(context)!.loginRegisterPendingToast)),
                             );
+                            register(username, password);
                           }
                         },
                         child: Text(AppLocalizations.of(context)!.loginRegisterButton),
