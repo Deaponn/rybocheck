@@ -1,6 +1,7 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, middleware::Logger};
 use std::env;
 mod jwt;
+use env_logger::Env;
 
 #[get("")]
 async fn hello() -> impl Responder {
@@ -9,6 +10,7 @@ async fn hello() -> impl Responder {
 
 #[post("/login")]
 async fn login(req_body: String) -> impl Responder {
+    print!("received ");
     HttpResponse::Ok().body(req_body)
 }
 
@@ -19,9 +21,12 @@ async fn main() -> std::io::Result<()> {
         .expect("API_PORT environment variable is not set")
         .parse::<u16>()
         .expect("Could not parse API_PORT as an int");
+    
+    env_logger::init_from_env(Env::default().default_filter_or("info"));
 
     HttpServer::new(|| {
-        App::new().service(
+        App::new()
+        .wrap(Logger::default()).service(
             web::scope("/rybocheck/api/v1")
             .service(hello)
             .service(login),

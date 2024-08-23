@@ -1,9 +1,32 @@
 import 'dart:typed_data';
 
+import 'package:Rybocheck/src/utils/network.dart';
 import 'package:argon2/argon2.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-typedef JwtTokenPair = ({String accessToken, String refreshToken});
+class JwtTokenPair {
+  final String accessToken;
+  final String refreshToken;
+
+  const JwtTokenPair({
+    required this.accessToken,
+    required this.refreshToken,
+  });
+
+  factory JwtTokenPair.fromJson(Map<String, dynamic> json) {
+    return switch (json) {
+      {
+        'accessToken': String accessToken,
+        'refreshToken': String refreshToken,
+      } =>
+        JwtTokenPair(
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        ),
+      _ => throw const FormatException('Failed to parse tokens.'),
+    };
+  }
+}
 
 const type = Argon2Parameters.ARGON2_id;
 const version = Argon2Parameters.ARGON2_VERSION_10;

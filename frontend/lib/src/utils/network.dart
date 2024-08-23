@@ -4,42 +4,59 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:Rybocheck/src/utils/encryption.dart';
 
-typedef ServerResponse<T> = ({T? responseBody, String status, String? error});
+class ServerResponse<T> {
+  final String status;
+  final T? responseBody;
+  final String? error;
+
+  const ServerResponse(this.status, this.responseBody, this.error);
+
+  factory ServerResponse.fromJson(Map<String, dynamic> json, T Function(Map<String, dynamic>) responseConstructor) {
+    return switch (json) {
+      {'status': String status, 'body': Map<String, dynamic> body} =>
+        ServerResponse(status, responseConstructor(body), null),
+      {'status': String status, 'error': String error} => ServerResponse(status, null, error),
+      _ => throw const FormatException('Failed to parse response body.'),
+    };
+  }
+}
 
 typedef AuthResponse = ({JwtTokenPair? tokens, String status, String? error});
 
-Future<T> postRequest<T>(String path, Object body) async {
+Future<ServerResponse<T>> getRequest<T>(String path, T Function(Map<String, dynamic>) responseConstructor) async {
   final String apiUrl = dotenv.env['API_URL']!;
-
-  final response = await http.post(Uri.parse('https://$apiUrl/$path'), body: body);
-
-  return jsonDecode(response.body) as T;
-}
-
-Future<AuthResponse> login(String username, String password) async {
-  final hashedPassword = hashPassword(username, password);
-
-  final result =
-      await postRequest<ServerResponse<JwtTokenPair>>("login", {username: username, hashedPassword: hashedPassword});
-
-  print(result);
-
-  if (result.status == "success") {
-    return (tokens: result.responseBody!, status: result.status, error: null);
-  } else {
-    return (error: result.error!, status: result.status, tokens: null);
+  try {
+    final response = await http.get(Uri.parse('http://$apiUrl/$path'));
+    return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
+  } catch (err) {
+    rethrow;
   }
 }
 
-Future<AuthResponse> register(String username, String password, [String? email, String? phoneNumber]) async {
+Future<ServerResponse<T>> postRequest<T>(
+    String path, Object body, T Function(Map<String, dynamic>) responseConstructor) async {
+  final String apiUrl = dotenv.env['API_URL']!;
+  try {
+    final response = await http.post(Uri.parse('http://$apiUrl/$path'), body: body);
+    return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
+  } catch (err) {
+    rethrow;
+  }
+}
+
+Future<ServerResponse<JwtTokenPair>> login(String username, String password) async {
   final hashedPassword = hashPassword(username, password);
 
-  final result = await postRequest<ServerResponse<JwtTokenPair>>(
-      "register", {username: username, hashedPassword: hashedPassword, email: email, phoneNumber: phoneNumber});
+  return await postRequest<JwtTokenPair>(
+      "login", {username: username, hashedPassword: hashedPassword}, JwtTokenPair.fromJson);
+}
 
-  if (result.status == "success") {
-    return (tokens: result.responseBody!, status: result.status, error: null);
-  } else {
-    return (error: result.error!, status: result.status, tokens: null);
-  }
+Future<ServerResponse<JwtTokenPair>> register(String username, String password,
+    [String? email, String? phoneNumber]) async {
+  final hashedPassword = hashPassword(username, password);
+
+  return await postRequest<JwtTokenPair>(
+      "register",
+      {username: username, hashedPassword: hashedPassword, email: email, phoneNumber: phoneNumber},
+      JwtTokenPair.fromJson);
 }

@@ -69,7 +69,7 @@ class _AuthenticateState extends State<Authenticate> {
                       usernameField,
                       passwordField,
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           // Validate returns true if the form is valid, or false otherwise.
                           if (_loginFormKey.currentState!.validate()) {
                             // If the form is valid, display a snackbar. In the real world,
@@ -78,7 +78,9 @@ class _AuthenticateState extends State<Authenticate> {
                               SnackBar(content: Text(AppLocalizations.of(context)!.loginLoginPendingToast)),
                             );
                             _loginFormKey.currentState!.save();
-                            login(username, password);
+                            var tokens = await login(username, password);
+                            print(
+                                "$tokens, ${tokens.status}, ${tokens.responseBody}, ${tokens.responseBody?.accessToken}, ${tokens.responseBody?.refreshToken}, ${tokens.error}");
                           }
                         },
                         child: Text(AppLocalizations.of(context)!.loginLoginButton),
