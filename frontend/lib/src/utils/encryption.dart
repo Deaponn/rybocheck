@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:Rybocheck/src/utils/network.dart';
 import 'package:argon2/argon2.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -13,8 +12,8 @@ class JwtTokenPair {
     required this.refreshToken,
   });
 
-  factory JwtTokenPair.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
+  factory JwtTokenPair.fromJson(Map<String, dynamic> jwtJson) {
+    return switch (jwtJson) {
       {
         'accessToken': String accessToken,
         'refreshToken': String refreshToken,
