@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:Rybocheck/src/utils/encryption.dart';
 
+// TODO: change status from String to enum
 class ServerResponse<T> {
   final String status;
   final T? responseBody;

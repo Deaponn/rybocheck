@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Rybocheck/src/views/post.dart';
 
@@ -7,7 +8,18 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text("Home page", textAlign: TextAlign.center);
+    const storage = FlutterSecureStorage();
+    final iat = storage.read(key: 'accessToken');
+    return FutureBuilder<String?>(
+        future: iat,
+        builder: (BuildContext context, AsyncSnapshot<String?> accessToken) {
+          if (accessToken.hasData && accessToken.data != null) {
+            print("basic null: ${null}, got null: ${accessToken.data}");
+            return Text("Home page, access token: ${accessToken.data}", textAlign: TextAlign.center);
+          } else {
+            return const Text("Home page", textAlign: TextAlign.center);
+          }
+        });
   }
 }
 

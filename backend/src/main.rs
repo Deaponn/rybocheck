@@ -42,7 +42,7 @@ async fn login(request: web::Json<LoginRequest>) -> impl Responder {
     }
     let response = json!({
         "status": "failure",
-        "error": "wrong username and password combination"
+        "error": "WrongCredentials"
     }).to_string();
     HttpResponse::Ok().body(response)
 }

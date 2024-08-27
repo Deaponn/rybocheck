@@ -33,23 +33,23 @@ fn create_token(
         Some(lifetime) => json!({
             "sub": user_id,
             "permissionLevel": permission_level,
-            "iat": current_timestamp,
-            "exp": current_timestamp + Duration::new(lifetime, 0)
+            "iat": current_timestamp.as_secs(),
+            "exp": (current_timestamp + Duration::new(lifetime, 0)).as_secs()
         })
         .to_string(),
         _ => json!({
             "sub": user_id,
             "permissionLevel": permission_level,
-            "iat": current_timestamp
+            "iat": current_timestamp.as_secs()
         })
         .to_string(),
     });
     let hash: GenericArray<u8, _> = Sha256::digest(format!("{header}.{payload}.{server_secret}").as_bytes());
     
-    let mut buf = [0u8; 64];
-    let signature = base16ct::lower::encode_str(&hash, &mut buf).unwrap();
+    let mut signature = [0u8; 64];
+    base16ct::lower::encode_str(&hash, &mut signature).unwrap();
 
-    format!("{header}.{payload}.{signature}")
+    format!("{header}.{payload}.{}", String::from_utf8(signature.to_vec()).unwrap())
 }
 
 pub fn create_refresh_token(user_id: u32, permission_level: PermissionLevel) -> String {

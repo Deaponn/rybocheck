@@ -1,9 +1,13 @@
+import 'package:Rybocheck/src/utils/encryption.dart';
 import 'package:Rybocheck/src/utils/network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:Rybocheck/src/components/text_switch.dart';
+
+enum SubmitAction { Login, Register }
 
 class Authenticate extends StatefulWidget {
   const Authenticate({super.key});
@@ -49,6 +53,45 @@ class _AuthenticateState extends State<Authenticate> {
       },
     );
 
+    void Function() submitAction(SubmitAction action) {
+      return () async {
+        if (_loginFormKey.currentState!.validate()) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                content: Text(action == SubmitAction.Login
+                    ? AppLocalizations.of(context)!.loginLoginPendingToast
+                    : AppLocalizations.of(context)!.loginRegisterPendingToast)),
+          );
+          _loginFormKey.currentState!.save();
+          ServerResponse<JwtTokenPair> response;
+          if (action == SubmitAction.Login) {
+            response = await login(username, password);
+          } else {
+            response = await register(username, password);
+          }
+          if (response.status == "success") {
+            const storage = FlutterSecureStorage();
+            await storage.write(key: 'accessToken', value: response.responseBody!.accessToken);
+            await storage.write(key: 'refreshToken', value: response.responseBody!.refreshToken);
+          } else {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                content: Text(response.error!),
+              ));
+            }
+          }
+        }
+      };
+    }
+
     return Column(
       children: [
         TextSwitch(
@@ -69,20 +112,7 @@ class _AuthenticateState extends State<Authenticate> {
                       usernameField,
                       passwordField,
                       ElevatedButton(
-                        onPressed: () async {
-                          // Validate returns true if the form is valid, or false otherwise.
-                          if (_loginFormKey.currentState!.validate()) {
-                            // If the form is valid, display a snackbar. In the real world,
-                            // you'd often call a server or save the information in a database.
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(AppLocalizations.of(context)!.loginLoginPendingToast)),
-                            );
-                            _loginFormKey.currentState!.save();
-                            var tokens = await login(username, password);
-                            print(
-                                "$tokens, ${tokens.status}, ${tokens.responseBody}, ${tokens.responseBody?.accessToken}, ${tokens.responseBody?.refreshToken}, ${tokens.error}");
-                          }
-                        },
+                        onPressed: submitAction(SubmitAction.Login),
                         child: Text(AppLocalizations.of(context)!.loginLoginButton),
                       ),
                     ],
@@ -109,17 +139,7 @@ class _AuthenticateState extends State<Authenticate> {
                         },
                       ),
                       ElevatedButton(
-                        onPressed: () {
-                          // Validate returns true if the form is valid, or false otherwise.
-                          if (_registerFormKey.currentState!.validate()) {
-                            // If the form is valid, display a snackbar. In the real world,
-                            // you'd often call a server or save the information in a database.
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(AppLocalizations.of(context)!.loginRegisterPendingToast)),
-                            );
-                            register(username, password);
-                          }
-                        },
+                        onPressed: submitAction(SubmitAction.Register),
                         child: Text(AppLocalizations.of(context)!.loginRegisterButton),
                       ),
                     ],
