@@ -1,8 +1,7 @@
 # Rust server
 backend/target
 
-dev.env
-prod.env
+.env
 
 # Miscellaneous
 *.class

@@ -14,7 +14,6 @@ class Home extends StatelessWidget {
         future: iat,
         builder: (BuildContext context, AsyncSnapshot<String?> accessToken) {
           if (accessToken.hasData && accessToken.data != null) {
-            print("basic null: ${null}, got null: ${accessToken.data}");
             return Text("Home page, access token: ${accessToken.data}", textAlign: TextAlign.center);
           } else {
             return const Text("Home page", textAlign: TextAlign.center);

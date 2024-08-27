@@ -84,6 +84,7 @@ class _AuthenticateState extends State<Authenticate> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
+                // TODO: print localized errors
                 content: Text(response.error!),
               ));
             }
