@@ -14,9 +14,7 @@ struct LoginRequest {
 }
 
 fn check_credentials(username: &str, password: &str) -> bool {
-    if username == "admin"
-        && password == "37bb2162f62286505299b0147d2598dfe8a8c1c4ed7ac8346dbb9cfab31ae080"
-    {
+    if username == "admin" && password == "37bb2162f62286505299b0147d2598dfe8a8c1c4ed7ac8346dbb9cfab31ae080" {
         return true;
     }
     false
@@ -62,28 +60,34 @@ async fn main() -> std::io::Result<()> {
     let url: String = env::var("API_URL").expect("API_URL environment variable is not set");
     let db_user: String = env::var("DB_USER").expect("DB_USER environment variable is not set");
     let db_address: String = env::var("DB_ADDRESS").expect("DB_ADDRESS environment variable is not set");
+    let db_password: Option<String> = env::var("DB_PASSWORD").ok();
     let db_name: String = env::var("DB_NAME").expect("DB_NAME environment variable is not set");
-    let db_connection = format!("postgres://{db_user}@{db_address}/{db_name}");
+    let db_connection = match db_password {
+        Some(db_password) if db_password != "" => format!("postgres://{db_user}:{db_password}@{db_address}/{db_name}"),
+        _ => format!("postgres://{db_user}@{db_address}/{db_name}"),
+    };
+
+    println!("{db_connection}");
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&db_connection)
-        .await.expect("Database connection error");
+        .await
+        .expect("Database connection error");
 
     let row: (String,) = sqlx::query_as("SELECT version()")
         .fetch_one(&pool)
-        .await.expect("Query error");
+        .await
+        .expect("Query error");
 
     println!("query outcome: {:?}", row);
 
     env_logger::init_from_env(Env::default().default_filter_or("info"));
 
     HttpServer::new(|| {
-        App::new().wrap(Logger::default()).service(
-            web::scope("/rybocheck/api/v1")
-                .service(login)
-                .service(hello),
-        )
+        App::new()
+            .wrap(Logger::default())
+            .service(web::scope("/rybocheck/api/v1").service(login).service(hello))
     })
     .bind((url, port))?
     .run()
