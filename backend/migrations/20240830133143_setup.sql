@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-08-19 22:02:25.766
+-- Last modification date: 2024-08-30 14:21:37.786
 
 -- tables
 -- Table: comment_likes
@@ -16,14 +16,14 @@ CREATE INDEX comments_likes_comment_id on comment_likes (comment_id ASC);
 
 -- Table: comment_statuses
 CREATE TABLE comment_statuses (
-    status_id int  NOT NULL,
+    status_id serial  NOT NULL,
     status_name varchar(64)  NOT NULL,
     CONSTRAINT comment_statuses_pk PRIMARY KEY (status_id)
 );
 
 -- Table: comments
 CREATE TABLE comments (
-    comment_id integer  NOT NULL,
+    comment_id serial  NOT NULL,
     user_id integer  NOT NULL,
     post_id integer  NOT NULL,
     reply_to integer  NULL,
@@ -55,7 +55,7 @@ CREATE INDEX post_likes_post_id on post_likes (post_id ASC);
 
 -- Table: post_statuses
 CREATE TABLE post_statuses (
-    status_id int  NOT NULL,
+    status_id serial  NOT NULL,
     status_name varchar(64)  NOT NULL,
     CONSTRAINT post_statuses_pk PRIMARY KEY (status_id)
 );
@@ -73,7 +73,7 @@ CREATE INDEX post_tags_tag_id on post_tags (tag_id ASC);
 
 -- Table: posts
 CREATE TABLE posts (
-    post_id int  NOT NULL,
+    post_id serial  NOT NULL,
     user_id int  NOT NULL,
     title varchar(255)  NOT NULL,
     description text  NULL,
@@ -92,14 +92,14 @@ CREATE INDEX posts_user_id on posts (user_id ASC);
 
 -- Table: roles
 CREATE TABLE roles (
-    role_id int  NOT NULL,
+    role_id serial  NOT NULL,
     role_name varchar(64)  NOT NULL,
     CONSTRAINT roles_pk PRIMARY KEY (role_id)
 );
 
 -- Table: tags
 CREATE TABLE tags (
-    tag_id int  NOT NULL,
+    tag_id serial  NOT NULL,
     tag_name int  NOT NULL,
     CONSTRAINT tags_pk PRIMARY KEY (tag_id)
 );
@@ -117,15 +117,16 @@ CREATE TABLE user_data (
 
 -- Table: user_statuses
 CREATE TABLE user_statuses (
-    status_id int  NOT NULL,
+    status_id serial  NOT NULL,
     status_name varchar(64)  NOT NULL,
     CONSTRAINT user_statuses_pk PRIMARY KEY (status_id)
 );
 
 -- Table: users
 CREATE TABLE users (
-    user_id int  NOT NULL,
+    user_id serial  NOT NULL,
     username varchar(255)  NOT NULL,
+    password_hash varchar(255)  NOT NULL,
     role_id int  NOT NULL,
     status_id int  NOT NULL,
     created_at timestamp  NOT NULL DEFAULT current_timestamp,
