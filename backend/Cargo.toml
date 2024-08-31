@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4"
+argon2 = "0.5.3"
 base16ct = "0.2.0"
 base64 = "0.22.1"
 dotenvy = "0.15.7"

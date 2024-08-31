@@ -10,6 +10,7 @@ use std::{
 };
 mod database;
 mod jwt;
+mod encryption;
 
 #[derive(Deserialize, Debug)]
 struct LoginRequest {

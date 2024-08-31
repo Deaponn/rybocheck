@@ -7,6 +7,8 @@ use std::env;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use base16ct;
 
+use crate::encryption::encrypt_with_sha2;
+
 const ACCESS_TOKEN_LIFESPAN: u64 = 5 * 60;
 #[derive(Serialize)]
 pub enum PermissionLevel {
@@ -44,12 +46,9 @@ fn create_token(
         })
         .to_string(),
     });
-    let hash: GenericArray<u8, _> = Sha256::digest(format!("{header}.{payload}.{server_secret}").as_bytes());
-    
-    let mut signature = [0u8; 64];
-    base16ct::lower::encode_str(&hash, &mut signature).unwrap();
+    let signature: String = encrypt_with_sha2(format!("{header}.{payload}.{server_secret}"));
 
-    format!("{header}.{payload}.{}", String::from_utf8(signature.to_vec()).unwrap())
+    format!("{header}.{payload}.{signature}")
 }
 
 pub fn create_refresh_token(user_id: u32, permission_level: PermissionLevel) -> String {
