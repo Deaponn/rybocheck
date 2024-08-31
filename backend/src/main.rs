@@ -64,23 +64,28 @@ async fn main() -> std::io::Result<()> {
         .expect("Could not parse API_PORT as an int");
     let url: String = env::var("API_URL").expect("API_URL environment variable is not set");
     let db_url: String = env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set");
-    let db_name: String = env::var("DATABASE_NAME").expect("DATABASE_NAME environment variable is not set");
-    let db_path: String = format!("{db_url}/{db_name}");
 
     if args[1] == "reset-database" {
         println!("resetting the whole database...");
         let _ = Command::new("psql")
-            .args([&db_url, "-c", "DROP DATABASE rybocheck"])
-            .status();
+            .args([&db_url, "-a", "-f", "migrations/drop_database.sql"])
+            .output()
+            .expect("Failed to DROP");
+        println!("DROP all TABLEs successful");
         let _ = Command::new("psql")
-            .args([&db_url, "-c", "CREATE DATABASE rybocheck"])
-            .status();
-        let _ = Command::new("cargo").args(["sqlx", "migrate", "run"]).status();
-        println!("MIGRATE SUCCESSFUL");
+            .args([&db_url, "-a", "-f", "migrations/setup_database.sql"])
+            .output()
+            .expect("Failed to CREATE");
+        println!("CREATE all TABLEs successful");
+        let _ = Command::new("psql")
+            .args([&db_url, "-a", "-f", "migrations/insert_constants.sql"])
+            .output()
+            .expect("Failed to populate with constants");
+        println!("INSERT all constants successful");
         return Ok(());
     }
 
-    let database = DatabaseConnection::new(&db_path)
+    let database = DatabaseConnection::new(&db_url)
         .await
         .expect("Failed to establish databse connection");
 
