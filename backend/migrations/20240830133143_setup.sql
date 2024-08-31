@@ -108,7 +108,7 @@ CREATE TABLE tags (
 CREATE TABLE user_data (
     user_id int  NOT NULL,
     email varchar(255)  NULL,
-    phone_number varchar(32)  NOT NULL,
+    phone_number varchar(32)  NULL,
     description text  NULL,
     profile_picture_path varchar(255)  NULL,
     settings text  NULL,

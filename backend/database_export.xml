@@ -19,7 +19,7 @@
         </Counter>
         <Counter>
             <Name>column</Name>
-            <Value>46</Value>
+            <Value>47</Value>
             <Prefix>c</Prefix>
         </Counter>
         <Counter>
@@ -29,7 +29,7 @@
         </Counter>
         <Counter>
             <Name>index</Name>
-            <Value>15</Value>
+            <Value>17</Value>
             <Prefix>i</Prefix>
         </Counter>
         <Counter>
@@ -119,7 +119,7 @@
             <Columns>
                 <Column Id="c1">
                     <Name>status_id</Name>
-                    <Type>int</Type>
+                    <Type>serial</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
                     <DefaultValue></DefaultValue>
@@ -155,7 +155,7 @@
             <Columns>
                 <Column Id="c3">
                     <Name>comment_id</Name>
-                    <Type>integer</Type>
+                    <Type>serial</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
                     <DefaultValue></DefaultValue>
@@ -424,7 +424,7 @@
             <Columns>
                 <Column Id="c16">
                     <Name>status_id</Name>
-                    <Type>int</Type>
+                    <Type>serial</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
                     <DefaultValue></DefaultValue>
@@ -460,7 +460,7 @@
             <Columns>
                 <Column Id="c18">
                     <Name>post_id</Name>
-                    <Type>int</Type>
+                    <Type>serial</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
                     <DefaultValue></DefaultValue>
@@ -591,7 +591,7 @@
             <Columns>
                 <Column Id="c27">
                     <Name>role_id</Name>
-                    <Type>int</Type>
+                    <Type>serial</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
                     <DefaultValue></DefaultValue>
@@ -627,7 +627,7 @@
             <Columns>
                 <Column Id="c29">
                     <Name>status_id</Name>
-                    <Type>int</Type>
+                    <Type>serial</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
                     <DefaultValue></DefaultValue>
@@ -663,7 +663,7 @@
             <Columns>
                 <Column Id="c31">
                     <Name>user_id</Name>
-                    <Type>int</Type>
+                    <Type>serial</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
                     <DefaultValue></DefaultValue>
@@ -672,6 +672,15 @@
                 </Column>
                 <Column Id="c32">
                     <Name>username</Name>
+                    <Type>varchar(255)</Type>
+                    <Description></Description>
+                    <Nullable>false</Nullable>
+                    <DefaultValue></DefaultValue>
+                    <CheckExpression></CheckExpression>
+                    <Properties/>
+                </Column>
+                <Column Id="c47">
+                    <Name>password_hash</Name>
                     <Type>varchar(255)</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
@@ -769,7 +778,7 @@
                     <Name>phone_number</Name>
                     <Type>varchar(32)</Type>
                     <Description></Description>
-                    <Nullable>false</Nullable>
+                    <Nullable>true</Nullable>
                     <DefaultValue></DefaultValue>
                     <CheckExpression></CheckExpression>
                     <Properties/>
@@ -821,7 +830,7 @@
             <Columns>
                 <Column Id="c43">
                     <Name>tag_id</Name>
-                    <Type>int</Type>
+                    <Type>serial</Type>
                     <Description></Description>
                     <Nullable>false</Nullable>
                     <DefaultValue></DefaultValue>
@@ -882,7 +891,30 @@
                 </Columns>
             </PrimaryKey>
             <AlternateKeys/>
-            <Indexes/>
+            <Indexes>
+                <Index Id="i16">
+                    <Name>post_tags_post_id</Name>
+                    <Description></Description>
+                    <Columns>
+                        <Column>
+                            <Column>c45</Column>
+                            <Ascending>true</Ascending>
+                        </Column>
+                    </Columns>
+                    <Properties/>
+                </Index>
+                <Index Id="i17">
+                    <Name>post_tags_tag_id</Name>
+                    <Description></Description>
+                    <Columns>
+                        <Column>
+                            <Column>c46</Column>
+                            <Ascending>true</Ascending>
+                        </Column>
+                    </Columns>
+                    <Properties/>
+                </Index>
+            </Indexes>
             <TableChecks/>
             <AdditionalSQLBefore></AdditionalSQLBefore>
             <AdditionalSQLAfter></AdditionalSQLAfter>
@@ -1197,7 +1229,7 @@
         <TableDisplay Id="td2">
             <X>5029.5</X>
             <Y>5493.5</Y>
-            <Width>173.0</Width>
+            <Width>186.0</Width>
             <Height>130.0</Height>
             <LineColor>#000000</LineColor>
             <FillColor>#ffffff</FillColor>
@@ -1226,7 +1258,7 @@
         </TableDisplay>
         <TableDisplay Id="td5">
             <X>5332.5</X>
-            <Y>5853.5</Y>
+            <Y>5854.5</Y>
             <Width>170.0</Width>
             <Height>58.0</Height>
             <LineColor>#000000</LineColor>
@@ -1246,7 +1278,7 @@
         </TableDisplay>
         <TableDisplay Id="td7">
             <X>5589.5</X>
-            <Y>5540.5</Y>
+            <Y>5539.5</Y>
             <Width>170.0</Width>
             <Height>58.0</Height>
             <LineColor>#000000</LineColor>
@@ -1256,7 +1288,7 @@
         </TableDisplay>
         <TableDisplay Id="td8">
             <X>5589.5</X>
-            <Y>5450.5</Y>
+            <Y>5449.5</Y>
             <Width>170.0</Width>
             <Height>58.0</Height>
             <LineColor>#000000</LineColor>
@@ -1268,7 +1300,7 @@
             <X>5321.5</X>
             <Y>5534.5</Y>
             <Width>195.0</Width>
-            <Height>100.0</Height>
+            <Height>116.0</Height>
             <LineColor>#000000</LineColor>
             <FillColor>#ffffff</FillColor>
             <Table>t9</Table>
@@ -1285,9 +1317,9 @@
             <FixedSize>false</FixedSize>
         </TableDisplay>
         <TableDisplay Id="td11">
-            <X>4838.5</X>
+            <X>4839.5</X>
             <Y>5847.5</Y>
-            <Width>120.0</Width>
+            <Width>122.0</Width>
             <Height>60.0</Height>
             <LineColor>#000000</LineColor>
             <FillColor>#ffffff</FillColor>
@@ -1503,11 +1535,11 @@
             <ControlPoints>
                 <ControlPoint>
                     <X>5406.5</X>
-                    <Y>5879.5</Y>
+                    <Y>5880.5</Y>
                 </ControlPoint>
                 <ControlPoint>
                     <X>5342.5</X>
-                    <Y>5879.5</Y>
+                    <Y>5880.5</Y>
                 </ControlPoint>
                 <ControlPoint>
                     <X>5342.5</X>
@@ -1557,7 +1589,7 @@
             <ControlPoints>
                 <ControlPoint>
                     <X>5625.5</X>
-                    <Y>5571.5</Y>
+                    <Y>5570.5</Y>
                 </ControlPoint>
                 <ControlPoint>
                     <X>5625.5</X>
@@ -1599,11 +1631,11 @@
             <ControlPoints>
                 <ControlPoint>
                     <X>5721.5</X>
-                    <Y>5475.5</Y>
+                    <Y>5474.5</Y>
                 </ControlPoint>
                 <ControlPoint>
                     <X>5439.5</X>
-                    <Y>5475.5</Y>
+                    <Y>5474.5</Y>
                 </ControlPoint>
                 <ControlPoint>
                     <X>5439.5</X>

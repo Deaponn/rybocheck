@@ -1,12 +1,15 @@
 use actix_web::{get, middleware::Logger, post, web, App, HttpResponse, HttpServer, Responder};
+use database::DatabaseConnection;
 use env_logger::Env;
 use jwt::{create_access_token, create_refresh_token, PermissionLevel};
-use database::DatabaseConnection;
 use serde::Deserialize;
 use serde_json::json;
-use std::env;
-mod jwt;
+use std::{
+    env::{self},
+    process::Command,
+};
 mod database;
+mod jwt;
 
 #[derive(Deserialize, Debug)]
 struct LoginRequest {
@@ -53,6 +56,7 @@ async fn login(request: web::Json<LoginRequest>) -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let args: Vec<String> = env::args().collect();
     let _ = dotenvy::from_filename(".env");
     let port: u16 = env::var("API_PORT")
         .expect("API_PORT environment variable is not set")
@@ -60,12 +64,38 @@ async fn main() -> std::io::Result<()> {
         .expect("Could not parse API_PORT as an int");
     let url: String = env::var("API_URL").expect("API_URL environment variable is not set");
     let db_url: String = env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set");
+    let db_name: String = env::var("DATABASE_NAME").expect("DATABASE_NAME environment variable is not set");
+    let db_path: String = format!("{db_url}/{db_name}");
 
-    let database = DatabaseConnection::new(&db_url).await.expect("Failed to establish databse connection");
+    if args[1] == "reset-database" {
+        println!("resetting the whole database...");
+        let _ = Command::new("psql")
+            .args([&db_url, "-c", "DROP DATABASE rybocheck"])
+            .status();
+        let _ = Command::new("psql")
+            .args([&db_url, "-c", "CREATE DATABASE rybocheck"])
+            .status();
+        let _ = Command::new("cargo").args(["sqlx", "migrate", "run"]).status();
+        println!("MIGRATE SUCCESSFUL");
+        return Ok(());
+    }
 
-    database.register("admin2", "cool-hash", None, Some("+48 512123456")).await.expect("Query error");
-    database.register("admin4", "cool-hash", None, Some("+48 512123456")).await.expect("Query error");
-    database.register("test2", "cool-hash", Some("my.email@test.org"), None).await.expect("Query error");
+    let database = DatabaseConnection::new(&db_path)
+        .await
+        .expect("Failed to establish databse connection");
+
+    database
+        .register("admin2", "cool-hash", None, Some("+48 512123456"))
+        .await
+        .expect("Query error");
+    database
+        .register("admin4", "cool-hash", None, Some("+48 512123456"))
+        .await
+        .expect("Query error");
+    database
+        .register("test2", "cool-hash", Some("my.email@test.org"), None)
+        .await
+        .expect("Query error");
 
     env_logger::init_from_env(Env::default().default_filter_or("info"));
 
