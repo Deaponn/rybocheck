@@ -1,11 +1,12 @@
 use actix_web::{get, middleware::Logger, post, web, App, HttpResponse, HttpServer, Responder};
 use env_logger::Env;
 use jwt::{create_access_token, create_refresh_token, PermissionLevel};
+use database::DatabaseConnection;
 use serde::Deserialize;
 use serde_json::json;
-use sqlx::postgres::PgPoolOptions;
 use std::env;
 mod jwt;
+mod database;
 
 #[derive(Deserialize, Debug)]
 struct LoginRequest {
@@ -58,29 +59,13 @@ async fn main() -> std::io::Result<()> {
         .parse::<u16>()
         .expect("Could not parse API_PORT as an int");
     let url: String = env::var("API_URL").expect("API_URL environment variable is not set");
-    let db_user: String = env::var("DB_USER").expect("DB_USER environment variable is not set");
-    let db_address: String = env::var("DB_ADDRESS").expect("DB_ADDRESS environment variable is not set");
-    let db_password: Option<String> = env::var("DB_PASSWORD").ok();
-    let db_name: String = env::var("DB_NAME").expect("DB_NAME environment variable is not set");
-    let db_connection = match db_password {
-        Some(db_password) if db_password != "" => format!("postgres://{db_user}:{db_password}@{db_address}/{db_name}"),
-        _ => format!("postgres://{db_user}@{db_address}/{db_name}"),
-    };
+    let db_url: String = env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set");
 
-    println!("{db_connection}");
+    let database = DatabaseConnection::new(&db_url).await.expect("Failed to establish databse connection");
 
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&db_connection)
-        .await
-        .expect("Database connection error");
-
-    let row: (String,) = sqlx::query_as("SELECT version()")
-        .fetch_one(&pool)
-        .await
-        .expect("Query error");
-
-    println!("query outcome: {:?}", row);
+    database.register("admin2", "cool-hash", None, Some("+48 512123456")).await.expect("Query error");
+    database.register("admin4", "cool-hash", None, Some("+48 512123456")).await.expect("Query error");
+    database.register("test2", "cool-hash", Some("my.email@test.org"), None).await.expect("Query error");
 
     env_logger::init_from_env(Env::default().default_filter_or("info"));
 
