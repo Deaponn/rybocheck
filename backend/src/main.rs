@@ -1,13 +1,12 @@
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use database::DatabaseConnection;
 use env_logger::Env;
-use std::{
-    env::{self},
-    process::Command,
-};
+use std::env::{self};
+use utils::run_scripts::{ScriptRunner, Scripts};
 mod database;
 mod routes;
 mod security;
+mod utils;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -20,23 +19,9 @@ async fn main() -> std::io::Result<()> {
     let url: String = env::var("API_URL").expect("API_URL environment variable is not set");
     let db_url: String = env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set");
 
-    if args[1] == "reset-database" {
-        println!("resetting the whole database...");
-        let _ = Command::new("psql")
-            .args([&db_url, "-a", "-f", "migrations/drop_database.sql"])
-            .output()
-            .expect("Failed to DROP");
-        println!("DROP all TABLEs successful");
-        let _ = Command::new("psql")
-            .args([&db_url, "-a", "-f", "migrations/setup_database.sql"])
-            .output()
-            .expect("Failed to CREATE");
-        println!("CREATE all TABLEs successful");
-        let _ = Command::new("psql")
-            .args([&db_url, "-a", "-f", "migrations/insert_constants.sql"])
-            .output()
-            .expect("Failed to populate with constants");
-        println!("INSERT all constants successful");
+    if ScriptRunner::new(args)
+    .add_new(Scripts::ResetDatabase, &db_url)
+    .run_all() {
         return Ok(());
     }
 
