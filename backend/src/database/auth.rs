@@ -1,7 +1,28 @@
+use crate::security::Encryption;
+
+use super::{users::User, DatabaseConnection};
 use sqlx::Error;
-use super::DatabaseConnection;
 
 impl DatabaseConnection {
+    pub async fn login(&self, username: &str, password: &str) -> Result<Option<User>, Error> {
+        let user = self.get_user_by_username(username).await?;
+        if user == None {
+            return Ok(None);
+        }
+        let existing_user = user.unwrap();
+        let passwords_match_or_err = Encryption::verify_password(password, &existing_user.password_hash);
+        if let Err(_) = passwords_match_or_err {
+            println!("src/database/auth.rs: Encryption::verify_password Error");
+            return Ok(None);
+        }
+        let passwords_match = passwords_match_or_err.unwrap();
+        if passwords_match {
+            return Ok(Some(existing_user));
+        } else {
+            return Ok(None);
+        }
+    }
+
     pub async fn register(
         &self,
         username: &str,

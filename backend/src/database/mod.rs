@@ -1,7 +1,7 @@
 use sqlx::PgPool;
 
 mod connection;
-mod auth;
+pub mod auth;
 mod users;
 
 pub struct DatabaseConnection {

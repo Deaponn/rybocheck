@@ -18,7 +18,7 @@ typedef FullRouteData = ({
   List<NavigationDestination> Function(BuildContext) destinations
 });
 
-enum PermissionLevel { admin, moderator, user, unauthenticated }
+enum Roles { admin, moderator, user, unauthenticated }
 
 List<StatefulShellBranch> unauthenticatedBranches = [
   homeBranch,
@@ -41,11 +41,11 @@ PreferredSizeWidget Function(BuildContext) unauthenticatedAppBar = (BuildContext
 };
 
 List<NavigationDestination> Function(BuildContext) unauthenticatedDestinations = (context) => <NavigationDestination>[
-  NavigationDestination(icon: const Icon(Icons.home), label: AppLocalizations.of(context)!.navBarHome),
-  NavigationDestination(icon: const Icon(Icons.search), label: AppLocalizations.of(context)!.navBarSearch),
-  NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarMap),
-  NavigationDestination(icon: const Icon(Icons.login), label: AppLocalizations.of(context)!.navBarLogin)
-];
+      NavigationDestination(icon: const Icon(Icons.home), label: AppLocalizations.of(context)!.navBarHome),
+      NavigationDestination(icon: const Icon(Icons.search), label: AppLocalizations.of(context)!.navBarSearch),
+      NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarMap),
+      NavigationDestination(icon: const Icon(Icons.login), label: AppLocalizations.of(context)!.navBarLogin)
+    ];
 
 List<StatefulShellBranch> userBranches = [
   homeBranch,
@@ -69,12 +69,12 @@ PreferredSizeWidget Function(BuildContext) userAppBar = (BuildContext context) {
 };
 
 List<NavigationDestination> Function(BuildContext) userDestinations = (context) => <NavigationDestination>[
-  NavigationDestination(icon: const Icon(Icons.home), label: AppLocalizations.of(context)!.navBarHome),
-  NavigationDestination(icon: const Icon(Icons.search), label: AppLocalizations.of(context)!.navBarSearch),
-  NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarNewPost),
-  NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarMap),
-  NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarProfile),
-];
+      NavigationDestination(icon: const Icon(Icons.home), label: AppLocalizations.of(context)!.navBarHome),
+      NavigationDestination(icon: const Icon(Icons.search), label: AppLocalizations.of(context)!.navBarSearch),
+      NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarNewPost),
+      NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarMap),
+      NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarProfile),
+    ];
 
 List<StatefulShellBranch> moderatorBranches = [...userBranches, moderatorPageBranch];
 
@@ -122,19 +122,19 @@ PreferredSizeWidget Function(BuildContext) adminAppBar = (BuildContext context) 
 
 List<NavigationDestination> Function(BuildContext) adminDestinations = moderatorDestinations;
 
-PermissionLevel Function(String) getPermissionLevel = (String jwt) {
-  return PermissionLevel.admin;
+Roles Function(String) getRoles = (String jwt) {
+  return Roles.admin;
 };
 
-FullRouteData Function(PermissionLevel) getFullRouteData = (PermissionLevel permission) {
+FullRouteData Function(Roles) getFullRouteData = (Roles permission) {
   switch (permission) {
-    case PermissionLevel.admin:
+    case Roles.admin:
       return (branches: adminBranches, appBar: adminAppBar, destinations: adminDestinations);
-    case PermissionLevel.moderator:
+    case Roles.moderator:
       return (branches: moderatorBranches, appBar: moderatorAppBar, destinations: moderatorDestinations);
-    case PermissionLevel.user:
+    case Roles.user:
       return (branches: userBranches, appBar: userAppBar, destinations: userDestinations);
-    case PermissionLevel.unauthenticated:
+    case Roles.unauthenticated:
       return (
         branches: unauthenticatedBranches,
         appBar: unauthenticatedAppBar,

@@ -29,18 +29,23 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Failed to establish databse connection");
 
-    database
-        .register("admin2", "cool-hash", None, Some("+48 512123456"))
-        .await
-        .expect("Query error");
-    database
-        .register("admin4", "cool-hash", None, Some("+48 512123456"))
-        .await
-        .expect("Query error");
-    database
-        .register("test2", "cool-hash", Some("my.email@test.org"), None)
-        .await
-        .expect("Query error");
+    let admin4 = database.get_user_by_username("admin4").await;
+    let test2 = database.get_user_by_username("test2").await;
+    println!("admin4: {:?}", admin4);
+    println!("test2: {:?}", test2);
+
+    // database
+    //     .register("admin2", "cool-hash", None, Some("+48 512123456"))
+    //     .await
+    //     .expect("Query error");
+    // database
+    //     .register("admin4", "cool-hash", None, Some("+48 512123456"))
+    //     .await
+    //     .expect("Query error");
+    // database
+    //     .register("test2", "cool-hash", Some("my.email@test.org"), None)
+    //     .await
+    //     .expect("Query error");
 
     env_logger::init_from_env(Env::default().default_filter_or("info"));
 

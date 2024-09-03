@@ -1,8 +1,8 @@
+use crate::security::jwt::Roles;
+use crate::security::Jwt;
+use actix_web::{post, web, HttpResponse, Responder};
 use serde::Deserialize;
 use serde_json::json;
-use actix_web::{post, web, HttpResponse, Responder};
-use crate::security::jwt::PermissionLevel;
-use crate::security::Jwt;
 
 #[derive(Deserialize, Debug)]
 struct LoginRequest {
@@ -26,8 +26,8 @@ pub async fn login(request: web::Json<LoginRequest>) -> impl Responder {
         let response = json!({
             "status": "success",
             "body": {
-                "accessToken": Jwt::create_access_token(0, PermissionLevel::Admin),
-                "refreshToken": Jwt::create_refresh_token(0, PermissionLevel::Admin)
+                "accessToken": Jwt::create_access_token(0, Roles::Admin),
+                "refreshToken": Jwt::create_refresh_token(0, Roles::Admin)
             }
         })
         .to_string();

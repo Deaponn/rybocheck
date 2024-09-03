@@ -26,8 +26,8 @@ class Application extends StatefulWidget {
 }
 
 class _ApplicationState extends State<Application> {
-  PermissionLevel permission = PermissionLevel.unauthenticated;
-  FullRouteData routeData = getFullRouteData(PermissionLevel.unauthenticated);
+  Roles permission = Roles.unauthenticated;
+  FullRouteData routeData = getFullRouteData(Roles.unauthenticated);
 
   late final ValueNotifier<RoutingConfig> myRoutingConfig = ValueNotifier<RoutingConfig>(
     RoutingConfig(routes: <RouteBase>[
