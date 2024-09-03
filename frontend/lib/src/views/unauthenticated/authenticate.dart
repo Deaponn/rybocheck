@@ -1,4 +1,4 @@
-import 'package:Rybocheck/src/utils/encryption.dart';
+import 'package:Rybocheck/src/utils/jwt.dart';
 import 'package:Rybocheck/src/utils/network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -55,7 +55,8 @@ class _AuthenticateState extends State<Authenticate> {
 
     void Function() submitAction(SubmitAction action) {
       return () async {
-        if (_loginFormKey.currentState!.validate()) {
+        if ((action == SubmitAction.Login && _loginFormKey.currentState!.validate()) ||
+            (action == SubmitAction.Register && _registerFormKey.currentState!.validate())) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 behavior: SnackBarBehavior.floating,
@@ -66,8 +67,8 @@ class _AuthenticateState extends State<Authenticate> {
                     ? AppLocalizations.of(context)!.loginLoginPendingToast
                     : AppLocalizations.of(context)!.loginRegisterPendingToast)),
           );
-          _loginFormKey.currentState!.save();
-          ServerResponse<JwtTokenPair> response;
+          action == SubmitAction.Login ? _loginFormKey.currentState!.save() : _registerFormKey.currentState!.save();
+          ServerResponse<JwtPair> response;
           if (action == SubmitAction.Login) {
             response = await login(username, password);
           } else {
@@ -75,8 +76,8 @@ class _AuthenticateState extends State<Authenticate> {
           }
           if (response.status == "success") {
             const storage = FlutterSecureStorage();
-            await storage.write(key: 'accessToken', value: response.responseBody!.accessToken);
-            await storage.write(key: 'refreshToken', value: response.responseBody!.refreshToken);
+            await storage.write(key: 'accessToken', value: response.responseBody!.accessToken.body.permissionLevel);
+            await storage.write(key: 'refreshToken', value: response.responseBody!.refreshToken.body.permissionLevel);
           } else {
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(

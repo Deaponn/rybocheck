@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:Rybocheck/src/utils/encryption.dart';
+import 'package:Rybocheck/src/utils/jwt.dart';
 
 // TODO: change status from String to enum
 class ServerResponse<T> {
@@ -22,7 +22,7 @@ class ServerResponse<T> {
   }
 }
 
-typedef AuthResponse = ({JwtTokenPair? tokens, String status, String? error});
+typedef AuthResponse = ({JwtPair? tokens, String status, String? error});
 
 Future<ServerResponse<T>> getRequest<T>(String path, T Function(Map<String, dynamic>) responseConstructor) async {
   final String apiUrl = dotenv.env['API_URL']!;
@@ -46,19 +46,15 @@ Future<ServerResponse<T>> postRequest<T>(
   }
 }
 
-Future<ServerResponse<JwtTokenPair>> login(String username, String password) async {
+Future<ServerResponse<JwtPair>> login(String username, String password) async {
   final hashedPassword = hashPassword(username, password);
 
-  return await postRequest<JwtTokenPair>(
-      "login", {'username': username, 'password': hashedPassword}, JwtTokenPair.fromJson);
+  return await postRequest<JwtPair>("login", {'username': username, 'password': hashedPassword}, JwtPair.fromJson);
 }
 
-Future<ServerResponse<JwtTokenPair>> register(String username, String password,
-    [String? email, String? phoneNumber]) async {
+Future<ServerResponse<JwtPair>> register(String username, String password, [String? email, String? phoneNumber]) async {
   final hashedPassword = hashPassword(username, password);
 
-  return await postRequest<JwtTokenPair>(
-      "register",
-      {'username': username, 'password': hashedPassword, 'email': email, 'phoneNumber': phoneNumber},
-      JwtTokenPair.fromJson);
+  return await postRequest<JwtPair>("register",
+      {'username': username, 'password': hashedPassword, 'email': email, 'phoneNumber': phoneNumber}, JwtPair.fromJson);
 }

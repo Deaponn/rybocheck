@@ -8,6 +8,10 @@ mod routes;
 mod security;
 mod utils;
 
+struct AppState {
+    database_connection: DatabaseConnection,
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let args: Vec<String> = env::args().collect();
@@ -20,17 +24,18 @@ async fn main() -> std::io::Result<()> {
     let db_url: String = env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set");
 
     if ScriptRunner::new(args)
-    .add_new(Scripts::ResetDatabase, &db_url)
-    .run_all() {
+        .add_new(Scripts::ResetDatabase, &db_url)
+        .run_all()
+    {
         return Ok(());
     }
 
-    let database = DatabaseConnection::new(&db_url)
+    let database_connection = DatabaseConnection::new(&db_url)
         .await
         .expect("Failed to establish databse connection");
 
-    let admin4 = database.get_user_by_username("admin4").await;
-    let test2 = database.get_user_by_username("test2").await;
+    let admin4 = database_connection.get_user_by_username("admin4").await;
+    let test2 = database_connection.get_user_by_username("test2").await;
     println!("admin4: {:?}", admin4);
     println!("test2: {:?}", test2);
 
@@ -49,12 +54,15 @@ async fn main() -> std::io::Result<()> {
 
     env_logger::init_from_env(Env::default().default_filter_or("info"));
 
-    HttpServer::new(|| {
-        App::new().wrap(Logger::default()).service(
-            web::scope("/rybocheck/api/v1")
-                .service(routes::auth::login)
-                .service(routes::root::hello),
-        )
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(AppState { database_connection: database_connection.clone() }))
+            .wrap(Logger::default())
+            .service(
+                web::scope("/rybocheck/api/v1")
+                    .service(routes::auth::login)
+                    .service(routes::root::hello),
+            )
     })
     .bind((url, port))?
     .run()

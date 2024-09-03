@@ -14,7 +14,7 @@ import 'package:Rybocheck/src/utils/allow_routes.dart';
 // DotEnv another_dotenv = DotEnv()
 
 Future main() async {
-  await dotenv.load(fileName: "dev.env", mergeWith: Platform.environment);
+  await dotenv.load(fileName: ".env", mergeWith: Platform.environment);
   runApp(const Application());
 }
 
