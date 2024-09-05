@@ -1,6 +1,14 @@
 {
     "@@locale": "pl",
 
+    "argon2Error": "Wystąpił błąd serwera",
+    "sqlxError": "Wystąpił błąd serwera",
+    "wrongCredentials": "Niewłaściwy login lub hasło",
+    "userExists": "Podana nazwa użytkownika jest już zajęta",
+    "unauthenticated": "Nie jesteś zalogowany",
+    "unauthorized": "Nie masz wymaganych uprawnień",
+    "unknownError": "Wystąpił nieznany błąd",
+
     "navBarHome": "Główna",
     "navBarSearch": "Szukaj",
     "navBarNewPost": "Nowy wpis",

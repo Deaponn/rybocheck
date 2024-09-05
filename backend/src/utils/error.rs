@@ -20,8 +20,8 @@ pub enum UserErrors {
 impl Display for InternalErrors {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match *self {
-            InternalErrors::Argon2Error => write!(f, "Argon2 Error"),
-            InternalErrors::SqlxError => write!(f, "SQLx Error")
+            InternalErrors::Argon2Error => write!(f, "argon2Error"),
+            InternalErrors::SqlxError => write!(f, "sqlxError")
         }
     }
 }
@@ -29,10 +29,10 @@ impl Display for InternalErrors {
 impl Display for UserErrors {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match *self {
-            UserErrors::WrongCredentials => write!(f, "WrongCredentials"),
-            UserErrors::UserExists => write!(f, "UserExists"),
-            UserErrors::Unauthenticated => write!(f, "Unauthenticated"),
-            UserErrors::Unauthorized => write!(f, "Unauthorized"),
+            UserErrors::WrongCredentials => write!(f, "wrongCredentials"),
+            UserErrors::UserExists => write!(f, "userExists"),
+            UserErrors::Unauthenticated => write!(f, "unauthenticated"),
+            UserErrors::Unauthorized => write!(f, "unauthorized"),
         }
     }
 }

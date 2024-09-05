@@ -1,6 +1,14 @@
 {
     "@@locale": "en",
 
+    "argon2Error": "Internal server error",
+    "sqlxError": "Internal server error",
+    "wrongCredentials": "Wrong username or password",
+    "userExists": "Username taken",
+    "unauthenticated": "You are not logged in",
+    "unauthorized": "You don't have permission to see this resource",
+    "unknownError": "Unknown error",
+
     "navBarHome": "Home",
     "navBarSearch": "Search",
     "navBarNewPost": "New post",

@@ -78,17 +78,14 @@ class _AuthenticateState extends State<Authenticate> {
             const storage = FlutterSecureStorage();
             await storage.write(key: 'accessToken', value: response.responseBody!.accessToken.body.permissionLevel);
             await storage.write(key: 'refreshToken', value: response.responseBody!.refreshToken.body.permissionLevel);
-          } else {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                // TODO: print localized errors
-                content: Text(response.error!),
-              ));
-            }
+          } else if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              content: Text(localizeErrorResponse(response.error!, context)),
+            ));
           }
         }
       };

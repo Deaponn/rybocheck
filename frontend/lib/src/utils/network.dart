@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:Rybocheck/src/utils/jwt.dart';
@@ -57,4 +59,30 @@ Future<ServerResponse<JwtPair>> register(String username, String password, [Stri
 
   return await postRequest<JwtPair>("register",
       {'username': username, 'password': hashedPassword, 'email': email, 'phoneNumber': phoneNumber}, JwtPair.fromJson);
+}
+
+// "argon2Error": "Internal server error",
+//     "sqlxError": "Internal server error",
+//     "wrongCredentials": "Wrong username or password",
+//     "userExists": "Username taken",
+//     "unauthenticated": "You are not logged in",
+//     "unauthorized": "You don't have permission to see this resource",
+
+String localizeErrorResponse(String key, BuildContext context) {
+  switch (key) {
+    case "argon2Error":
+      return AppLocalizations.of(context)!.argon2Error;
+    case "sqlxError":
+      return AppLocalizations.of(context)!.sqlxError;
+    case "wrongCredentials":
+      return AppLocalizations.of(context)!.wrongCredentials;
+    case "userExists":
+      return AppLocalizations.of(context)!.userExists;
+    case "unauthenticated":
+      return AppLocalizations.of(context)!.unauthenticated;
+    case "unauthorized":
+      return AppLocalizations.of(context)!.unauthorized;
+    default:
+      return AppLocalizations.of(context)!.unknownError;
+  }
 }
