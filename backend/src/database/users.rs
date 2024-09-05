@@ -1,8 +1,8 @@
-use crate::security::jwt::Roles;
+use crate::{security::jwt::Roles, utils::Error};
 
 use super::DatabaseConnection;
 use crate::security::FromString;
-use sqlx::{postgres::PgRow, types::time::PrimitiveDateTime, Error, FromRow, Row};
+use sqlx::{postgres::PgRow, types::time::PrimitiveDateTime, FromRow, Row};
 
 impl DatabaseConnection {
     pub async fn get_user_by_username(&self, username: &str) -> Result<Option<User>, Error> {
@@ -41,7 +41,7 @@ pub struct User {
 }
 
 impl FromRow<'_, PgRow> for User {
-    fn from_row(row: &PgRow) -> Result<Self, Error> {
+    fn from_row(row: &PgRow) -> Result<Self, sqlx::Error> {
         Ok(User {
             user_id: row.try_get("user_id")?,
             username: row.try_get("username")?,

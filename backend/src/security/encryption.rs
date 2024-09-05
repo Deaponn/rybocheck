@@ -1,10 +1,10 @@
 use argon2::{
-    password_hash::Error,
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
 use sha2::digest::generic_array::GenericArray;
 use sha2::{Digest, Sha256};
+use crate::utils::Error;
 
 use super::Encryption;
 

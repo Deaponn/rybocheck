@@ -29,7 +29,7 @@ impl FromString for Roles {
 }
 
 impl Jwt {
-    fn create_token(user_id: u32, permission_level: &Roles, token_type: &str, lifetime: Option<u64>) -> String {
+    fn create_token(user_id: i32, permission_level: &Roles, token_type: &str, lifetime: Option<u64>) -> String {
         let api_version = env::var("VERSION").expect("VERSION environment variable is not set");
         let server_secret = env::var("SERVER_SECRET").expect("SERVER_SECRET environment variable is not set");
         let current_timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
@@ -68,11 +68,11 @@ impl Jwt {
         Ok(res)
     }
 
-    pub fn create_refresh_token(user_id: u32, permission_level: &Roles) -> String {
+    pub fn create_refresh_token(user_id: i32, permission_level: &Roles) -> String {
         Jwt::create_token(user_id, permission_level, "refreshToken", None)
     }
 
-    pub fn create_access_token(user_id: u32, permission_level: &Roles) -> String {
+    pub fn create_access_token(user_id: i32, permission_level: &Roles) -> String {
         Jwt::create_token(user_id, permission_level, "accessToken", Some(ACCESS_TOKEN_LIFESPAN))
     }
 }

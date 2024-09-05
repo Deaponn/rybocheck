@@ -1,0 +1,96 @@
+use std::fmt::Display;
+
+use super::Error;
+use actix_web::{error, http::{header::ContentType, StatusCode}, HttpResponse};
+
+#[derive(Debug)]
+pub enum InternalErrors {
+    Argon2Error,
+    SqlxError,
+}
+
+#[derive(Debug)]
+pub enum UserErrors {
+    WrongCredentials,
+    UserExists,
+    Unauthenticated,
+    Unauthorized,
+}
+
+impl Display for InternalErrors {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match *self {
+            InternalErrors::Argon2Error => write!(f, "Argon2 Error"),
+            InternalErrors::SqlxError => write!(f, "SQLx Error")
+        }
+    }
+}
+
+impl Display for UserErrors {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match *self {
+            UserErrors::WrongCredentials => write!(f, "WrongCredentials"),
+            UserErrors::UserExists => write!(f, "UserExists"),
+            UserErrors::Unauthenticated => write!(f, "Unauthenticated"),
+            UserErrors::Unauthorized => write!(f, "Unauthorized"),
+        }
+    }
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Error::InternalError(error) => write!(f, "InternalError: {error}"),
+            Error::UserError(error) => write!(f, "{error}")
+        }
+    }
+}
+
+impl InternalErrors {
+    fn status_code(&self) -> StatusCode {
+        match *self {
+            InternalErrors::Argon2Error => StatusCode::INTERNAL_SERVER_ERROR,
+            InternalErrors::SqlxError => StatusCode::INTERNAL_SERVER_ERROR
+        }
+    }
+}
+
+impl UserErrors {
+    fn status_code(&self) -> StatusCode {
+        match *self {
+            UserErrors::WrongCredentials => StatusCode::BAD_REQUEST,
+            UserErrors::UserExists => StatusCode::CONFLICT,
+            UserErrors::Unauthenticated => StatusCode::UNAUTHORIZED,
+            UserErrors::Unauthorized => StatusCode::FORBIDDEN,
+        }
+    }
+}
+
+impl error::ResponseError for Error {
+    fn error_response(&self) -> HttpResponse {
+        HttpResponse::build(self.status_code())
+            .insert_header(ContentType::json())
+            .body(format!("{{\"status\": \"error\", \"error\": \"{}\"}}", self.to_string()))
+    }
+
+    fn status_code(&self) -> StatusCode {
+        match self {
+            Error::InternalError(error) => error.status_code(),
+            Error::UserError(error) => error.status_code()
+        }
+    }
+}
+
+// TODO: add logging for those errors??
+
+impl From<argon2::password_hash::Error> for Error {
+    fn from(_: argon2::password_hash::Error) -> Self {
+        Error::InternalError(InternalErrors::Argon2Error)
+    }
+}
+
+impl From<sqlx::Error> for Error {
+    fn from(_: sqlx::Error) -> Self {
+        Error::InternalError(InternalErrors::SqlxError)
+    }
+}

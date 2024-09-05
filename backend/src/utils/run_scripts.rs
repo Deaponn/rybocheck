@@ -1,9 +1,5 @@
 use std::process::Command;
-
-pub struct ScriptRunner<'a> {
-    args: Vec<String>,
-    scripts: Vec<Script<'a>>,
-}
+use super::ScriptRunner;
 
 impl<'a> ScriptRunner<'a> {
     pub fn new(args: Vec<String>) -> Self {

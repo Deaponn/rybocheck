@@ -1,7 +1,7 @@
 use crate::security::Encryption;
 
 use super::{users::User, DatabaseConnection};
-use sqlx::Error;
+use crate::utils::Error;
 
 impl DatabaseConnection {
     pub async fn login(&self, username: &str, password: &str) -> Result<Option<User>, Error> {
