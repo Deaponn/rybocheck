@@ -61,6 +61,7 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/rybocheck/api/v1")
                     .service(routes::auth::login)
+                    .service(routes::auth::register)
                     .service(routes::root::hello),
             )
     })

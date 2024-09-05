@@ -27,7 +27,7 @@ impl DatabaseConnection {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct User {
-    pub user_id: String,
+    pub user_id: i32,
     pub username: String,
     pub password_hash: String,
     pub role: Roles,

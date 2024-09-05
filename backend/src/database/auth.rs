@@ -38,8 +38,6 @@ impl DatabaseConnection {
 
         let mut tx = self.pool.begin().await?;
 
-        println!("username {}", username);
-
         let user_id: (i32,) = sqlx::query_as(
             "INSERT INTO users(username, password_hash, role_id, status_id) VALUES($1, $2, 4, 1) RETURNING user_id",
         )
@@ -48,16 +46,12 @@ impl DatabaseConnection {
         .fetch_one(&mut *tx)
         .await?;
 
-        println!("new user id {}", user_id.0);
-
         sqlx::query("INSERT INTO user_data(user_id, email, phone_number) VALUES ($1, $2, $3)")
             .bind(user_id.0)
             .bind(email)
             .bind(phone_number)
             .execute(&mut *tx)
             .await?;
-
-        println!("tx success");
 
         tx.commit().await?;
 
