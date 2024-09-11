@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-08-19 22:02:25.766
+-- Last modification date: 2024-09-11 21:12:57.788
 
 -- foreign keys
 ALTER TABLE comments
@@ -13,6 +13,9 @@ ALTER TABLE comment_likes
 
 ALTER TABLE comment_likes
     DROP CONSTRAINT comments_likes_users;
+
+ALTER TABLE photos
+    DROP CONSTRAINT photos_posts;
 
 ALTER TABLE post_tags
     DROP CONSTRAINT post_tags_tags;
@@ -53,6 +56,8 @@ DROP TABLE comment_likes;
 DROP TABLE comment_statuses;
 
 DROP TABLE comments;
+
+DROP TABLE photos;
 
 DROP TABLE post_likes;
 

@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-08-30 14:21:37.786
+-- Last modification date: 2024-09-11 21:12:57.788
 
 -- tables
 -- Table: comment_likes
@@ -41,6 +41,18 @@ CREATE INDEX comments_status_id on comments (status_id ASC);
 
 CREATE INDEX comments_reply_to on comments (reply_to ASC);
 
+-- Table: photos
+CREATE TABLE photos (
+    photo_id serial  NOT NULL,
+    post_id int  NOT NULL,
+    photo_path varchar(255)  NOT NULL,
+    width int  NOT NULL,
+    height int  NOT NULL,
+    CONSTRAINT photos_pk PRIMARY KEY (photo_id)
+);
+
+CREATE INDEX photos_post_id on photos (post_id ASC);
+
 -- Table: post_likes
 CREATE TABLE post_likes (
     user_id integer  NOT NULL,
@@ -79,7 +91,6 @@ CREATE TABLE posts (
     description text  NULL,
     location varchar(32)  NOT NULL,
     is_location_verified bool  NOT NULL,
-    photo_path varchar(255)  NULL,
     status_id int  NOT NULL,
     tag_id int  NOT NULL,
     created_at timestamp  NOT NULL DEFAULT current_timestamp,
@@ -166,6 +177,14 @@ ALTER TABLE comment_likes ADD CONSTRAINT comments_comments_likes
 ALTER TABLE comment_likes ADD CONSTRAINT comments_likes_users
     FOREIGN KEY (user_id)
     REFERENCES users (user_id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: photos_posts (table: photos)
+ALTER TABLE photos ADD CONSTRAINT photos_posts
+    FOREIGN KEY (post_id)
+    REFERENCES posts (post_id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
