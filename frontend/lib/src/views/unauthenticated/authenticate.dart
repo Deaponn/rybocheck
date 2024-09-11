@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:Rybocheck/src/components/text_switch.dart';
 
-enum SubmitAction { Login, Register }
+enum SubmitAction { login, register }
 
 class Authenticate extends StatefulWidget {
   const Authenticate({super.key});
@@ -55,21 +55,21 @@ class _AuthenticateState extends State<Authenticate> {
 
     void Function() submitAction(SubmitAction action) {
       return () async {
-        if ((action == SubmitAction.Login && _loginFormKey.currentState!.validate()) ||
-            (action == SubmitAction.Register && _registerFormKey.currentState!.validate())) {
+        if ((action == SubmitAction.login && _loginFormKey.currentState!.validate()) ||
+            (action == SubmitAction.register && _registerFormKey.currentState!.validate())) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
-                content: Text(action == SubmitAction.Login
+                content: Text(action == SubmitAction.login
                     ? AppLocalizations.of(context)!.loginLoginPendingToast
                     : AppLocalizations.of(context)!.loginRegisterPendingToast)),
           );
-          action == SubmitAction.Login ? _loginFormKey.currentState!.save() : _registerFormKey.currentState!.save();
+          action == SubmitAction.login ? _loginFormKey.currentState!.save() : _registerFormKey.currentState!.save();
           ServerResponse<JwtPair> response;
-          if (action == SubmitAction.Login) {
+          if (action == SubmitAction.login) {
             response = await login(username, password);
           } else {
             response = await register(username, password);
@@ -111,7 +111,7 @@ class _AuthenticateState extends State<Authenticate> {
                       usernameField,
                       passwordField,
                       ElevatedButton(
-                        onPressed: submitAction(SubmitAction.Login),
+                        onPressed: submitAction(SubmitAction.login),
                         child: Text(AppLocalizations.of(context)!.loginLoginButton),
                       ),
                     ],
@@ -138,7 +138,7 @@ class _AuthenticateState extends State<Authenticate> {
                         },
                       ),
                       ElevatedButton(
-                        onPressed: submitAction(SubmitAction.Register),
+                        onPressed: submitAction(SubmitAction.register),
                         child: Text(AppLocalizations.of(context)!.loginRegisterButton),
                       ),
                     ],

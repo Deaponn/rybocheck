@@ -25,7 +25,9 @@ async fn main() -> std::io::Result<()> {
 
     if ScriptRunner::new(args)
         .add_new(Scripts::ResetDatabase, &db_url)
-        .run_all()
+        .add_new(Scripts::SetupDatabase, &db_url)
+        .add_new(Scripts::DropDatabase, &db_url)
+        .try_all()
     {
         return Ok(());
     }

@@ -1,5 +1,5 @@
-use std::process::Command;
 use super::ScriptRunner;
+use std::process::{Command, Stdio};
 
 impl<'a> ScriptRunner<'a> {
     pub fn new(args: Vec<String>) -> Self {
@@ -15,7 +15,7 @@ impl<'a> ScriptRunner<'a> {
         self
     }
 
-    pub fn run_all(&self) -> bool {
+    pub fn try_all(&self) -> bool {
         let mut should_exit = false;
         for arg in &self.args {
             for script in &self.scripts {
@@ -42,29 +42,66 @@ impl<'a> Script<'a> {
                 arg,
                 action: RESET_DATABASE,
             },
+            Scripts::SetupDatabase => Script {
+                invoke_on: "setup-database",
+                arg,
+                action: SETUP_DATABASE,
+            },
+            Scripts::DropDatabase => Script {
+                invoke_on: "drop-database",
+                arg,
+                action: DROP_DATABASE,
+            },
         }
     }
 }
 
 pub enum Scripts {
     ResetDatabase,
+    SetupDatabase,
+    DropDatabase,
 }
 
 const RESET_DATABASE: fn(&str) -> bool = |db_url| {
-    let _ = Command::new("psql")
-        .args([db_url, "-a", "-f", "migrations/drop_database.sql"])
-        .output()
-        .expect("Failed to DROP");
-    println!("DROP all TABLEs successful");
-    let _ = Command::new("psql")
+    DROP_DATABASE(db_url);
+    SETUP_DATABASE(db_url);
+    true
+};
+
+const SETUP_DATABASE: fn(&str) -> bool = |db_url| {
+    let setup = Command::new("psql")
         .args([db_url, "-a", "-f", "migrations/setup_database.sql"])
-        .output()
-        .expect("Failed to CREATE");
-    println!("CREATE all TABLEs successful");
-    let _ = Command::new("psql")
+        .stdout(Stdio::null())
+        .status()
+        .expect("Failed to invoke CREATE command");
+    if setup.success() {
+        println!("Finished CREATE all TABLEs");
+    } else {
+        println!("Failed to CREATE TABLEs. Reason: {setup}");
+    }
+    let constants = Command::new("psql")
         .args([db_url, "-a", "-f", "migrations/insert_constants.sql"])
-        .output()
-        .expect("Failed to populate with constants");
-    println!("INSERT all constants successful");
+        .stdout(Stdio::null())
+        .status()
+        .expect("Failed to invoke populate with constants command");
+    if constants.success() {
+        println!("Finished INSERT all constants");
+    } else {
+        println!("Failed to INSERT constants. Reason: {constants}");
+    }
+    true
+};
+
+const DROP_DATABASE: fn(&str) -> bool = |db_url| {
+    let drop = Command::new("psql")
+        .args([db_url, "-a", "-f", "migrations/drop_database.sql"])
+        .stdout(Stdio::null())
+        .status()
+        .expect("Failed to invoke DROP command");
+    if drop.success() {
+        println!("Finished DROP all TABLEs");
+    } else {
+        println!("Failed to DROP TABLEs. Reason: {drop}");
+    }
     true
 };
