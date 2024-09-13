@@ -55,6 +55,7 @@ impl Jwt {
         format!("{header}.{payload}.{signature}")
     }
 
+    // TODO: create proper error
     pub fn check_if_valid(jwt_token: String) -> Result<bool, String> {
         let server_secret = env::var("SERVER_SECRET").expect("SERVER_SECRET environment variable is not set");
 
@@ -74,5 +75,10 @@ impl Jwt {
 
     pub fn create_access_token(user_id: i32, permission_level: &Roles) -> String {
         Jwt::create_token(user_id, permission_level, "accessToken", Some(ACCESS_TOKEN_LIFESPAN))
+    }
+
+    // TODO: implement
+    pub fn access_from_refresh(refresh_token: String) -> String {
+        Jwt::create_access_token(0, &Roles::User)
     }
 }

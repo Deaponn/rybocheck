@@ -9,6 +9,7 @@ pub enum InternalErrors {
     SqlxError,
 }
 
+// TODO: add BAD_REQUEST
 #[derive(Debug)]
 pub enum UserErrors {
     WrongCredentials,

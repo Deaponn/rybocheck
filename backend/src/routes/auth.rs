@@ -1,13 +1,23 @@
 use crate::{
     database::auth::OperationStatus,
     security::{Encryption, Jwt},
-    utils::error::UserErrors::{UserExists, WrongCredentials},
-    utils::Error,
+    utils::{
+        error::UserErrors::{UserExists, WrongCredentials, Unauthenticated},
+        Error,
+    },
     AppState,
 };
 use actix_web::{post, web, HttpResponse, Responder};
 use serde::Deserialize;
 use serde_json::json;
+
+#[derive(Deserialize, Debug)]
+struct RegisterRequest {
+    username: String,
+    password: String,
+    email: Option<String>,
+    phone_number: Option<String>,
+}
 
 #[derive(Deserialize, Debug)]
 struct LoginRequest {
@@ -16,11 +26,8 @@ struct LoginRequest {
 }
 
 #[derive(Deserialize, Debug)]
-struct RegisterRequest {
-    username: String,
-    password: String,
-    email: Option<String>,
-    phone_number: Option<String>,
+struct RefreshRequest {
+    refresh_token: String,
 }
 
 #[post("/register")]
@@ -81,4 +88,31 @@ pub async fn login(data: web::Data<AppState>, request: web::Json<LoginRequest>) 
     .to_string();
 
     Ok(HttpResponse::Ok().body(response))
+}
+
+// TODO: make old refresh_token invalid, use proper Error::UserError::BadRequest
+#[post("/refresh")]
+pub async fn refresh(_data: web::Data<AppState>, request: web::Json<RefreshRequest>) -> Result<impl Responder, Error> {
+    let refresh_token = &request.refresh_token;
+
+    match Jwt::check_if_valid((*refresh_token).clone()) {
+        Ok(is_valid) => {
+            if !is_valid {
+                return Err(Error::UserError(Unauthenticated));
+            }
+            let response = json!({
+                "status": "success",
+                "body": {
+                    "accessToken": Jwt::access_from_refresh((*refresh_token).clone()),
+                    "refreshToken": refresh_token
+                }
+            })
+            .to_string();
+
+            return Ok(HttpResponse::Ok().body(response));
+        }
+        Err(_) => {
+            return Err(Error::UserError(WrongCredentials));
+        }
+    }
 }
