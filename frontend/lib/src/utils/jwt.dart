@@ -71,11 +71,13 @@ class Jwt {
   final JwtHeader header;
   final JwtBody body;
   final String signature;
+  final String string;
 
   const Jwt({
     required this.header,
     required this.body,
     required this.signature,
+    required this.string,
   });
 
   static (String, String, String) decode(String encodedJwt) {
@@ -99,7 +101,13 @@ class Jwt {
     return Jwt(
         header: JwtHeader.fromJson(jsonDecode(decodedHeader)),
         body: JwtBody.fromJson(jsonDecode(decodedBody)),
-        signature: decodedSignature);
+        signature: decodedSignature,
+        string: encodedJwt);
+  }
+
+  @override
+  String toString() {
+    return string;
   }
 }
 

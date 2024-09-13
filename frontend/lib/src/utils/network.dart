@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:Rybocheck/src/utils/jwt.dart';
+
+const pingPongDuration = 3;
 
 // TODO: change status from String to enum
 class ServerResponse<T> {
@@ -26,22 +30,54 @@ class ServerResponse<T> {
 
 typedef AuthResponse = ({JwtPair? tokens, String status, String? error});
 
+// TODO: handle various server responses and client errors
+Future<JwtPair?> getValidTokens() async {
+  final String apiUrl = dotenv.env['API_URL']!;
+  const storage = FlutterSecureStorage();
+  final accessTokenString = await storage.read(key: 'accessToken');
+  final refreshTokenString = await storage.read(key: 'refreshToken');
+  if (accessTokenString == null && refreshTokenString == null) return null;
+  final accessToken = Jwt.fromString(accessTokenString!);
+  final refreshToken = Jwt.fromString(refreshTokenString!);
+  final currentSeconds = DateTime.now().millisecondsSinceEpoch / 1000;
+  if (accessToken.body.exp! >= currentSeconds + pingPongDuration) {
+    return JwtPair(accessToken: accessToken, refreshToken: refreshToken);
+  }
+  final newTokens =
+      await http.post(Uri.parse('http://$apiUrl/refresh'), body: jsonEncode({'refreshToken': refreshToken}), headers: {
+    HttpHeaders.authorizationHeader: 'Bearer ${accessToken.string}',
+    HttpHeaders.contentTypeHeader: "application/json"
+  });
+  return JwtPair.fromJson(jsonDecode(newTokens.body));
+}
+
+// TODO: handle error
 Future<ServerResponse<T>> getRequest<T>(String path, T Function(Map<String, dynamic>) responseConstructor) async {
   final String apiUrl = dotenv.env['API_URL']!;
+  final validTokens = await getValidTokens();
   try {
-    final response = await http.get(Uri.parse('http://$apiUrl/$path'));
+    final response = await http.get(
+      Uri.parse('http://$apiUrl/$path'),
+      headers: {
+        HttpHeaders.authorizationHeader: 'Bearer ${validTokens!.accessToken.string}',
+      },
+    );
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
   } catch (err) {
     rethrow;
   }
 }
 
+// TODO: handle error
 Future<ServerResponse<T>> postRequest<T>(
     String path, Object body, T Function(Map<String, dynamic>) responseConstructor) async {
   final String apiUrl = dotenv.env['API_URL']!;
+  final validTokens = await getValidTokens();
   try {
-    final response = await http
-        .post(Uri.parse('http://$apiUrl/$path'), body: jsonEncode(body), headers: {'Content-Type': "application/json"});
+    final response = await http.post(Uri.parse('http://$apiUrl/$path'), body: jsonEncode(body), headers: {
+      HttpHeaders.authorizationHeader: 'Bearer ${validTokens!.accessToken.string}',
+      HttpHeaders.contentTypeHeader: "application/json"
+    });
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
   } catch (err) {
     rethrow;
