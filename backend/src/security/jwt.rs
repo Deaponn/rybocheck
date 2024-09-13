@@ -1,11 +1,18 @@
 use base64::prelude::*;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::env;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use super::{Encryption, FromString};
 use super::Jwt;
+
+#[derive(Serialize, Deserialize)]
+struct RefreshTokenBody {
+    sub: i32,
+    permissionLevel: String,
+    iat: u64,
+}
 
 const ACCESS_TOKEN_LIFESPAN: u64 = 5 * 60;
 #[derive(Serialize, Debug, PartialEq, Eq)]
@@ -35,7 +42,7 @@ impl Jwt {
         let current_timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
 
         let header = BASE64_STANDARD.encode(json!({ "tokenType": token_type, "api": api_version }).to_string());
-        let payload = BASE64_STANDARD.encode(match lifetime {
+        let body = BASE64_STANDARD.encode(match lifetime {
             Some(lifetime) => json!({
                 "sub": user_id,
                 "permissionLevel": permission_level,
@@ -50,9 +57,9 @@ impl Jwt {
             })
             .to_string(),
         });
-        let signature: String = Encryption::encrypt_with_sha2(format!("{header}.{payload}.{server_secret}"));
+        let signature: String = Encryption::encrypt_with_sha2(format!("{header}.{body}.{server_secret}"));
 
-        format!("{header}.{payload}.{signature}")
+        format!("{header}.{body}.{signature}")
     }
 
     // TODO: create proper error
@@ -64,8 +71,8 @@ impl Jwt {
             return Err(String::from("Invalid JWT"));
         };
         let header = jwt_data[0];
-        let payload = jwt_data[1];
-        let res = jwt_data[2] == Encryption::encrypt_with_sha2(format!("{header}.{payload}.{server_secret}"));
+        let body = jwt_data[1];
+        let res = jwt_data[2] == Encryption::encrypt_with_sha2(format!("{header}.{body}.{server_secret}"));
         Ok(res)
     }
 
@@ -77,8 +84,13 @@ impl Jwt {
         Jwt::create_token(user_id, permission_level, "accessToken", Some(ACCESS_TOKEN_LIFESPAN))
     }
 
-    // TODO: implement
+    // TODO: handle Invalid JWT Error
     pub fn access_from_refresh(refresh_token: String) -> String {
-        Jwt::create_access_token(0, &Roles::User)
+        let jwt_data: Vec<&str> = refresh_token.split(".").collect();
+        // if jwt_data.len() != 3 {
+        //     return Err(String::from("Invalid JWT"));
+        // };
+        let body: RefreshTokenBody = serde_json::from_str(jwt_data[1]).expect("failed to serialize JWT");
+        Jwt::create_access_token(body.sub, &Roles::from_string(body.permissionLevel))
     }
 }
