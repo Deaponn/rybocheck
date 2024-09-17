@@ -9,13 +9,13 @@ pub enum InternalErrors {
     SqlxError,
 }
 
-// TODO: add BAD_REQUEST
 #[derive(Debug)]
 pub enum UserErrors {
     WrongCredentials,
     UserExists,
     Unauthenticated,
     Unauthorized,
+    BadRequest
 }
 
 impl Display for InternalErrors {
@@ -34,6 +34,7 @@ impl Display for UserErrors {
             UserErrors::UserExists => write!(f, "userExists"),
             UserErrors::Unauthenticated => write!(f, "unauthenticated"),
             UserErrors::Unauthorized => write!(f, "unauthorized"),
+            UserErrors::BadRequest => write!(f, "badRequest"),
         }
     }
 }
@@ -60,6 +61,7 @@ impl UserErrors {
     fn status_code(&self) -> StatusCode {
         match *self {
             UserErrors::WrongCredentials => StatusCode::BAD_REQUEST,
+            UserErrors::BadRequest => StatusCode::BAD_REQUEST,
             UserErrors::UserExists => StatusCode::CONFLICT,
             UserErrors::Unauthenticated => StatusCode::UNAUTHORIZED,
             UserErrors::Unauthorized => StatusCode::FORBIDDEN,
@@ -83,7 +85,6 @@ impl error::ResponseError for Error {
 }
 
 // TODO: add logging for those errors??
-
 impl From<argon2::password_hash::Error> for Error {
     fn from(_: argon2::password_hash::Error) -> Self {
         Error::InternalError(InternalErrors::Argon2Error)

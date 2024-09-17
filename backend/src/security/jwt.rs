@@ -4,14 +4,24 @@ use serde_json::json;
 use std::env;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use crate::utils::{Error, Error::UserError, error::UserErrors::WrongCredentials};
+
 use super::{Encryption, FromString};
 use super::Jwt;
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all="snake_case")]
 struct RefreshTokenBody {
     sub: i32,
-    permissionLevel: String,
+    permission_level: String,
     iat: u64,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all="snake_case")]
+struct TokenHead {
+    token_type: String,
+    api: String
 }
 
 const ACCESS_TOKEN_LIFESPAN: u64 = 5 * 60;
@@ -62,13 +72,12 @@ impl Jwt {
         format!("{header}.{body}.{signature}")
     }
 
-    // TODO: create proper error
-    pub fn check_if_valid(jwt_token: String) -> Result<bool, String> {
+    pub fn check_if_valid(jwt_token: String) -> Result<bool, Error> {
         let server_secret = env::var("SERVER_SECRET").expect("SERVER_SECRET environment variable is not set");
 
         let jwt_data: Vec<&str> = jwt_token.split(".").collect();
         if jwt_data.len() != 3 {
-            return Err(String::from("Invalid JWT"));
+            return Err(UserError(WrongCredentials));
         };
         let header = jwt_data[0];
         let body = jwt_data[1];
@@ -84,13 +93,15 @@ impl Jwt {
         Jwt::create_token(user_id, permission_level, "accessToken", Some(ACCESS_TOKEN_LIFESPAN))
     }
 
-    // TODO: handle Invalid JWT Error
-    pub fn access_from_refresh(refresh_token: String) -> String {
+    // TODO: add check for API version ??
+    pub fn access_from_refresh(refresh_token: String) -> Option<String> {
         let jwt_data: Vec<&str> = refresh_token.split(".").collect();
-        // if jwt_data.len() != 3 {
-        //     return Err(String::from("Invalid JWT"));
-        // };
-        let body: RefreshTokenBody = serde_json::from_str(jwt_data[1]).expect("failed to serialize JWT");
-        Jwt::create_access_token(body.sub, &Roles::from_string(body.permissionLevel))
+        let head_option: Option<TokenHead> = serde_json::from_str(jwt_data[0]).unwrap_or(None);
+        let body_option: Option<RefreshTokenBody> = serde_json::from_str(jwt_data[1]).unwrap_or(None);
+        if head_option.is_none() || head_option.unwrap().token_type != "refreshToken" || body_option.is_none() {
+            return None;
+        }
+        let body = body_option.unwrap();
+        Some(Jwt::create_access_token(body.sub, &Roles::from_string(body.permission_level)))
     }
 }

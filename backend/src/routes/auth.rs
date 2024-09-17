@@ -2,7 +2,8 @@ use crate::{
     database::auth::OperationStatus,
     security::{Encryption, Jwt},
     utils::{
-        error::UserErrors::{UserExists, WrongCredentials, Unauthenticated},
+        Error::UserError,
+        error::UserErrors::{BadRequest, UserExists, WrongCredentials},
         Error,
     },
     AppState,
@@ -95,24 +96,26 @@ pub async fn login(data: web::Data<AppState>, request: web::Json<LoginRequest>) 
 pub async fn refresh(_data: web::Data<AppState>, request: web::Json<RefreshRequest>) -> Result<impl Responder, Error> {
     let refresh_token = &request.refresh_token;
 
-    match Jwt::check_if_valid((*refresh_token).clone()) {
-        Ok(is_valid) => {
-            if !is_valid {
-                return Err(Error::UserError(Unauthenticated));
-            }
-            let response = json!({
-                "status": "success",
-                "body": {
-                    "accessToken": Jwt::access_from_refresh((*refresh_token).clone()),
-                    "refreshToken": refresh_token
-                }
-            })
-            .to_string();
+    let is_valid = Jwt::check_if_valid((*refresh_token).clone())?;
 
-            return Ok(HttpResponse::Ok().body(response));
-        }
-        Err(_) => {
-            return Err(Error::UserError(WrongCredentials));
-        }
+    if !is_valid {
+        return Err(Error::UserError(WrongCredentials));
     }
+
+    let access_token = Jwt::access_from_refresh((*refresh_token).clone());
+
+    if access_token == None {
+        return Err(UserError(BadRequest));
+    }
+
+    let response = json!({
+        "status": "success",
+        "body": {
+            "accessToken": access_token.unwrap(),
+            "refreshToken": refresh_token
+        }
+    })
+    .to_string();
+
+    Ok(HttpResponse::Ok().body(response))
 }

@@ -8,6 +8,7 @@
     "unauthenticated": "Nie jesteś zalogowany",
     "unauthorized": "Nie masz wymaganych uprawnień",
     "unknownError": "Wystąpił nieznany błąd",
+    "badRequest": "Błędne zapytanie do serwera",
 
     "navBarHome": "Główna",
     "navBarSearch": "Szukaj",

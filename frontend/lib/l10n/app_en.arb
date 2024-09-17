@@ -8,6 +8,7 @@
     "unauthenticated": "You are not logged in",
     "unauthorized": "You don't have permission to see this resource",
     "unknownError": "Unknown error",
+    "badRequest": "Bad request data",
 
     "navBarHome": "Home",
     "navBarSearch": "Search",

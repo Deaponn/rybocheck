@@ -112,6 +112,8 @@ String localizeErrorResponse(String key, BuildContext context) {
       return AppLocalizations.of(context)!.sqlxError;
     case "wrongCredentials":
       return AppLocalizations.of(context)!.wrongCredentials;
+    case "badRequest":
+      return AppLocalizations.of(context)!.badRequest;
     case "userExists":
       return AppLocalizations.of(context)!.userExists;
     case "unauthenticated":
