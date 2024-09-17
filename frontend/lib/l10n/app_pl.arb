@@ -9,6 +9,7 @@
     "unauthorized": "Nie masz wymaganych uprawnień",
     "unknownError": "Wystąpił nieznany błąd",
     "badRequest": "Błędne zapytanie do serwera",
+    "invalidAuth": "Wystąpił problem, zaloguj się ponownie",
 
     "navBarHome": "Główna",
     "navBarSearch": "Szukaj",
@@ -27,6 +28,6 @@
     "loginPasswordValidation": "Proszę podać hasło",
     "loginConfirmPasswordValidation": "Proszę powtórzyć hasło",
     "loginPasswordsDontMatch": "Hasła nie są takie same",
-    "loginUsernamePlaceholder": "twój login...",
-    "loginPasswordPlaceholder": "twoje hasło..."
+    "loginUsernamePlaceholder": "login...",
+    "loginPasswordPlaceholder": "hasło..."
 }

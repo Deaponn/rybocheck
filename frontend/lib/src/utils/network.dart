@@ -18,6 +18,13 @@ class ServerResponse<T> {
 
   const ServerResponse(this.status, this.responseBody, this.error);
 
+  static String errorFromBody(Map<String, dynamic> jsonBody) {
+    return switch (jsonBody) {
+      {'status': String _, 'error': String error} => error,
+      _ => throw const FormatException('Value is not an error.')
+    };
+  }
+
   factory ServerResponse.fromJson(Map<String, dynamic> jsonBody, T Function(Map<String, dynamic>) responseConstructor) {
     return switch (jsonBody) {
       {'status': String status, 'body': Map<String, dynamic> body} =>
@@ -30,36 +37,41 @@ class ServerResponse<T> {
 
 typedef AuthResponse = ({JwtPair? tokens, String status, String? error});
 
-// TODO: handle various server responses and client errors
-Future<JwtPair?> getValidTokens() async {
+Future<ServerResponse<JwtPair>> getValidTokens() async {
   final String apiUrl = dotenv.env['API_URL']!;
   const storage = FlutterSecureStorage();
   final accessTokenString = await storage.read(key: 'accessToken');
   final refreshTokenString = await storage.read(key: 'refreshToken');
-  if (accessTokenString == null && refreshTokenString == null) return null;
-  final accessToken = Jwt.fromString(accessTokenString!);
-  final refreshToken = Jwt.fromString(refreshTokenString!);
+  if (accessTokenString == null || refreshTokenString == null) {
+    return const ServerResponse('error', null, 'invalidAuth');
+  }
+  final accessToken = Jwt.fromString(accessTokenString);
+  final refreshToken = Jwt.fromString(refreshTokenString);
   final currentSeconds = DateTime.now().millisecondsSinceEpoch / 1000;
   if (accessToken.body.exp! >= currentSeconds + pingPongDuration) {
-    return JwtPair(accessToken: accessToken, refreshToken: refreshToken);
+    return ServerResponse('success', JwtPair(accessToken: accessToken, refreshToken: refreshToken), null);
   }
-  final newTokens =
-      await http.post(Uri.parse('http://$apiUrl/refresh'), body: jsonEncode({'refreshToken': refreshToken}), headers: {
-    HttpHeaders.authorizationHeader: 'Bearer ${accessToken.string}',
-    HttpHeaders.contentTypeHeader: "application/json"
-  });
-  return JwtPair.fromJson(jsonDecode(newTokens.body));
+  final newTokens = await http.post(Uri.parse('http://$apiUrl/refresh'),
+      body: jsonEncode({'refreshToken': refreshToken}),
+      headers: {
+        HttpHeaders.authorizationHeader: 'Bearer ${accessToken.string}',
+        HttpHeaders.contentTypeHeader: "application/json"
+      });
+  if (newTokens.statusCode != 200) {
+    return ServerResponse('error', null, ServerResponse.errorFromBody(jsonDecode(newTokens.body)));
+  }
+  return ServerResponse('success', JwtPair.fromJson(jsonDecode(newTokens.body)), null);
 }
 
-// TODO: handle error
 Future<ServerResponse<T>> getRequest<T>(String path, T Function(Map<String, dynamic>) responseConstructor) async {
   final String apiUrl = dotenv.env['API_URL']!;
   final validTokens = await getValidTokens();
+  if (validTokens.status == 'error') return validTokens as ServerResponse<T>;
   try {
     final response = await http.get(
       Uri.parse('http://$apiUrl/$path'),
       headers: {
-        HttpHeaders.authorizationHeader: 'Bearer ${validTokens!.accessToken.string}',
+        HttpHeaders.authorizationHeader: 'Bearer ${validTokens.responseBody!.accessToken.string}',
       },
     );
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
@@ -68,14 +80,14 @@ Future<ServerResponse<T>> getRequest<T>(String path, T Function(Map<String, dyna
   }
 }
 
-// TODO: handle error
 Future<ServerResponse<T>> postRequest<T>(
     String path, Object body, T Function(Map<String, dynamic>) responseConstructor) async {
   final String apiUrl = dotenv.env['API_URL']!;
   final validTokens = await getValidTokens();
+  if (validTokens.status == 'error') return validTokens as ServerResponse<T>;
   try {
     final response = await http.post(Uri.parse('http://$apiUrl/$path'), body: jsonEncode(body), headers: {
-      HttpHeaders.authorizationHeader: 'Bearer ${validTokens!.accessToken.string}',
+      HttpHeaders.authorizationHeader: 'Bearer ${validTokens.responseBody!.accessToken.string}',
       HttpHeaders.contentTypeHeader: "application/json"
     });
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
@@ -96,13 +108,6 @@ Future<ServerResponse<JwtPair>> register(String username, String password, [Stri
   return await postRequest<JwtPair>("register",
       {'username': username, 'password': hashedPassword, 'email': email, 'phoneNumber': phoneNumber}, JwtPair.fromJson);
 }
-
-// "argon2Error": "Internal server error",
-//     "sqlxError": "Internal server error",
-//     "wrongCredentials": "Wrong username or password",
-//     "userExists": "Username taken",
-//     "unauthenticated": "You are not logged in",
-//     "unauthorized": "You don't have permission to see this resource",
 
 String localizeErrorResponse(String key, BuildContext context) {
   switch (key) {

@@ -9,6 +9,7 @@
     "unauthorized": "You don't have permission to see this resource",
     "unknownError": "Unknown error",
     "badRequest": "Bad request data",
+    "invalidAuth": "An error occured, please log in again",
 
     "navBarHome": "Home",
     "navBarSearch": "Search",
@@ -27,6 +28,6 @@
     "loginPasswordValidation": "Please enter your password",
     "loginConfirmPasswordValidation": "Please confirm your password",
     "loginPasswordsDontMatch": "Passwords do not match",
-    "loginUsernamePlaceholder": "your username...",
-    "loginPasswordPlaceholder": "your password..."
+    "loginUsernamePlaceholder": "username...",
+    "loginPasswordPlaceholder": "password..."
 }
