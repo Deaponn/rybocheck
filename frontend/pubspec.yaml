@@ -43,6 +43,7 @@ dependencies:
   flutter_dotenv: ^5.1.0
   argon2: ^1.0.1
   flutter_secure_storage: ^4.2.1
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:

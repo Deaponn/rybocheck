@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:argon2/argon2.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class JwtHeader {
@@ -84,6 +85,8 @@ class Jwt {
     List<String> parts = encodedJwt.split(".");
 
     if (parts.length != 3) {
+      print("${encodedJwt}, ${parts}");
+      print("jwt len: ${parts.length}");
       throw const FormatException('Invalid JWT. Occured in Jwt.decode');
     }
 
@@ -140,6 +143,20 @@ const version = Argon2Parameters.ARGON2_VERSION_10;
 const iterations = 3;
 const memoryConsumedPowerOf2 = 14;
 const hashLength = 32;
+
+class JwtPairModel extends ChangeNotifier {
+  JwtPair? _tokens;
+
+  JwtPair? get tokens => _tokens;
+
+  void setTokens(JwtPair? tokens) {
+    print("swapping out tokens");
+    print("old tokens: ${_tokens == null ? "null" : _tokens!.accessToken.body.iat}");
+    print("new tokens: ${tokens == null ? "null" : tokens.accessToken.body.iat}");
+    _tokens = tokens;
+    notifyListeners();
+  }
+}
 
 String hashPassword(String username, String password) {
   final salt = (username + dotenv.env['CLIENT_PEPPER']!).toBytesLatin1();

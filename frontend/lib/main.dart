@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:Rybocheck/src/utils/jwt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -8,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:Rybocheck/src/components/main_scaffold.dart';
 import 'package:Rybocheck/src/utils/allow_routes.dart';
+import 'package:provider/provider.dart';
 
 // DotEnv dotenv = DotEnv() is automatically called during import.
 // If you want to load multiple dotenv files or name your dotenv object differently, you can do the following and import the singleton into the relavant files:
@@ -37,11 +39,14 @@ class _ApplicationState extends State<Application> {
             // using a BottomNavigationBar). The StatefulNavigationShell is passed
             // to be able access the state of the shell and to navigate to other
             // branches in a stateful way.
-            return MainScaffold(
-                routerState: state,
-                navigationShell: navigationShell,
-                appBar: routeData.appBar(context),
-                destinations: routeData.destinations(context));
+            return MultiProvider(
+              providers: [ChangeNotifierProvider(create: (context) => JwtPairModel())],
+              child: MainScaffold(
+                  routerState: state,
+                  navigationShell: navigationShell,
+                  appBar: routeData.appBar(context),
+                  destinations: routeData.destinations(context)),
+            );
           },
           branches: routeData.branches),
     ]),

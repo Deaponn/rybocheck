@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:Rybocheck/src/components/text_switch.dart';
+import 'package:provider/provider.dart';
 
 enum SubmitAction { login, register }
 
@@ -53,7 +54,7 @@ class _AuthenticateState extends State<Authenticate> {
       },
     );
 
-    void Function() submitAction(SubmitAction action) {
+    void Function() submitAction(JwtPairModel jwtPairModel, SubmitAction action) {
       return () async {
         if ((action == SubmitAction.login && _loginFormKey.currentState!.validate()) ||
             (action == SubmitAction.register && _registerFormKey.currentState!.validate())) {
@@ -76,8 +77,9 @@ class _AuthenticateState extends State<Authenticate> {
           }
           if (response.status == "success") {
             const storage = FlutterSecureStorage();
-            await storage.write(key: 'accessToken', value: response.responseBody!.accessToken.body.permissionLevel);
-            await storage.write(key: 'refreshToken', value: response.responseBody!.refreshToken.body.permissionLevel);
+            await storage.write(key: 'accessToken', value: response.responseBody!.accessToken.string);
+            await storage.write(key: 'refreshToken', value: response.responseBody!.refreshToken.string);
+            jwtPairModel.setTokens(response.responseBody);
           } else if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               behavior: SnackBarBehavior.floating,
@@ -91,62 +93,65 @@ class _AuthenticateState extends State<Authenticate> {
       };
     }
 
-    return Column(
-      children: [
-        TextSwitch(
-          leftText: AppLocalizations.of(context)!.loginSwitchLogin,
-          rightText: AppLocalizations.of(context)!.loginSwitchRegister,
-          switchValue: _loginRegisterChoice,
-          onSwitch: () {
-            setState(() => _loginRegisterChoice = 1 - _loginRegisterChoice);
-          },
-        ),
-        FractionallySizedBox(
-          widthFactor: 0.7,
-          child: _loginRegisterChoice == 0
-              ? Form(
-                  key: _loginFormKey,
-                  child: Column(
-                    children: <Widget>[
-                      usernameField,
-                      passwordField,
-                      ElevatedButton(
-                        onPressed: submitAction(SubmitAction.login),
-                        child: Text(AppLocalizations.of(context)!.loginLoginButton),
-                      ),
-                    ],
+    return Consumer<JwtPairModel>(builder: (context, jwtPairModel, child) {
+      return Column(
+        children: [
+          TextSwitch(
+            leftText: AppLocalizations.of(context)!.loginSwitchLogin,
+            rightText: AppLocalizations.of(context)!.loginSwitchRegister,
+            switchValue: _loginRegisterChoice,
+            onSwitch: () {
+              setState(() => _loginRegisterChoice = 1 - _loginRegisterChoice);
+            },
+          ),
+          FractionallySizedBox(
+            widthFactor: 0.7,
+            child: _loginRegisterChoice == 0
+                ? Form(
+                    key: _loginFormKey,
+                    child: Column(
+                      children: <Widget>[
+                        usernameField,
+                        passwordField,
+                        ElevatedButton(
+                          onPressed: submitAction(jwtPairModel, SubmitAction.login),
+                          child: Text(AppLocalizations.of(context)!.loginLoginButton),
+                        ),
+                      ],
+                    ),
+                  )
+                : Form(
+                    key: _registerFormKey,
+                    child: Column(
+                      children: <Widget>[
+                        usernameField,
+                        passwordField,
+                        TextFormField(
+                          autocorrect: false,
+                          decoration:
+                              InputDecoration(labelText: AppLocalizations.of(context)!.loginPasswordPlaceholder),
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return AppLocalizations.of(context)!.loginConfirmPasswordValidation;
+                            }
+                            if (value != _passwordController.value.text) {
+                              return AppLocalizations.of(context)!.loginPasswordsDontMatch;
+                            }
+                            return null;
+                          },
+                        ),
+                        ElevatedButton(
+                          onPressed: submitAction(jwtPairModel, SubmitAction.register),
+                          child: Text(AppLocalizations.of(context)!.loginRegisterButton),
+                        ),
+                      ],
+                    ),
                   ),
-                )
-              : Form(
-                  key: _registerFormKey,
-                  child: Column(
-                    children: <Widget>[
-                      usernameField,
-                      passwordField,
-                      TextFormField(
-                        autocorrect: false,
-                        decoration: InputDecoration(labelText: AppLocalizations.of(context)!.loginPasswordPlaceholder),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return AppLocalizations.of(context)!.loginConfirmPasswordValidation;
-                          }
-                          if (value != _passwordController.value.text) {
-                            return AppLocalizations.of(context)!.loginPasswordsDontMatch;
-                          }
-                          return null;
-                        },
-                      ),
-                      ElevatedButton(
-                        onPressed: submitAction(SubmitAction.register),
-                        child: Text(AppLocalizations.of(context)!.loginRegisterButton),
-                      ),
-                    ],
-                  ),
-                ),
-        )
-      ],
-    );
+          )
+        ],
+      );
+    });
   }
 }
 

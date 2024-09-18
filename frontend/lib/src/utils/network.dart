@@ -63,6 +63,16 @@ Future<ServerResponse<JwtPair>> getValidTokens() async {
   return ServerResponse('success', JwtPair.fromJson(jsonDecode(newTokens.body)), null);
 }
 
+Future<ServerResponse<T>> getRequestNoAuth<T>(String path, T Function(Map<String, dynamic>) responseConstructor) async {
+  final String apiUrl = dotenv.env['API_URL']!;
+  try {
+    final response = await http.get(Uri.parse('http://$apiUrl/$path'));
+    return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
+  } catch (err) {
+    rethrow;
+  }
+}
+
 Future<ServerResponse<T>> getRequest<T>(String path, T Function(Map<String, dynamic>) responseConstructor) async {
   final String apiUrl = dotenv.env['API_URL']!;
   final validTokens = await getValidTokens();
@@ -74,6 +84,18 @@ Future<ServerResponse<T>> getRequest<T>(String path, T Function(Map<String, dyna
         HttpHeaders.authorizationHeader: 'Bearer ${validTokens.responseBody!.accessToken.string}',
       },
     );
+    return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
+  } catch (err) {
+    rethrow;
+  }
+}
+
+Future<ServerResponse<T>> postRequestNoAuth<T>(
+    String path, Object body, T Function(Map<String, dynamic>) responseConstructor) async {
+  final String apiUrl = dotenv.env['API_URL']!;
+  try {
+    final response = await http.post(Uri.parse('http://$apiUrl/$path'),
+        body: jsonEncode(body), headers: {HttpHeaders.contentTypeHeader: "application/json"});
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
   } catch (err) {
     rethrow;
@@ -99,13 +121,14 @@ Future<ServerResponse<T>> postRequest<T>(
 Future<ServerResponse<JwtPair>> login(String username, String password) async {
   final hashedPassword = hashPassword(username, password);
 
-  return await postRequest<JwtPair>("login", {'username': username, 'password': hashedPassword}, JwtPair.fromJson);
+  return await postRequestNoAuth<JwtPair>(
+      "login", {'username': username, 'password': hashedPassword}, JwtPair.fromJson);
 }
 
 Future<ServerResponse<JwtPair>> register(String username, String password, [String? email, String? phoneNumber]) async {
   final hashedPassword = hashPassword(username, password);
 
-  return await postRequest<JwtPair>("register",
+  return await postRequestNoAuth<JwtPair>("register",
       {'username': username, 'password': hashedPassword, 'email': email, 'phoneNumber': phoneNumber}, JwtPair.fromJson);
 }
 
@@ -119,6 +142,8 @@ String localizeErrorResponse(String key, BuildContext context) {
       return AppLocalizations.of(context)!.wrongCredentials;
     case "badRequest":
       return AppLocalizations.of(context)!.badRequest;
+    case "invalidAuth":
+      return AppLocalizations.of(context)!.invalidAuth;
     case "userExists":
       return AppLocalizations.of(context)!.userExists;
     case "unauthenticated":
