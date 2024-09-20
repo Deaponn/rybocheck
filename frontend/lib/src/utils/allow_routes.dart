@@ -18,7 +18,25 @@ typedef FullRouteData = ({
   List<NavigationDestination> Function(BuildContext) destinations
 });
 
-enum Roles { admin, moderator, user, unauthenticated }
+// TODO: remove trustedUser if there is no difference between them and regular user
+enum Roles {
+  admin,
+  moderator,
+  trustedUser,
+  user,
+  unauthenticated;
+
+  static Roles fromString(String? string) {
+    if (string == null) return Roles.unauthenticated;
+    return switch (string.toLowerCase()) {
+      "admin" => Roles.admin,
+      "moderator" => Roles.moderator,
+      "trusteduser" => Roles.trustedUser,
+      "user" => Roles.user,
+      _ => Roles.unauthenticated
+    };
+  }
+}
 
 List<StatefulShellBranch> unauthenticatedBranches = [
   homeBranch,
@@ -71,9 +89,12 @@ PreferredSizeWidget Function(BuildContext) userAppBar = (BuildContext context) {
 List<NavigationDestination> Function(BuildContext) userDestinations = (context) => <NavigationDestination>[
       NavigationDestination(icon: const Icon(Icons.home), label: AppLocalizations.of(context)!.navBarHome),
       NavigationDestination(icon: const Icon(Icons.search), label: AppLocalizations.of(context)!.navBarSearch),
-      NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarNewPost),
+      // TODO: or add_box_outlined?
+      NavigationDestination(
+          icon: const Icon(Icons.add_circle_outline), label: AppLocalizations.of(context)!.navBarNewPost),
       NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarMap),
-      NavigationDestination(icon: const Icon(Icons.map), label: AppLocalizations.of(context)!.navBarProfile),
+      NavigationDestination(
+          icon: const Icon(Icons.account_circle_outlined), label: AppLocalizations.of(context)!.navBarProfile),
     ];
 
 List<StatefulShellBranch> moderatorBranches = [...userBranches, moderatorPageBranch];
@@ -132,6 +153,8 @@ FullRouteData Function(Roles) getFullRouteData = (Roles permission) {
       return (branches: adminBranches, appBar: adminAppBar, destinations: adminDestinations);
     case Roles.moderator:
       return (branches: moderatorBranches, appBar: moderatorAppBar, destinations: moderatorDestinations);
+    case Roles.trustedUser:
+      return (branches: userBranches, appBar: userAppBar, destinations: userDestinations);
     case Roles.user:
       return (branches: userBranches, appBar: userAppBar, destinations: userDestinations);
     case Roles.unauthenticated:

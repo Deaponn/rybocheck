@@ -9,14 +9,14 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<JwtPairModel>(
-        builder: (BuildContext context, JwtPairModel jwtPairModel, child) {
-          if (jwtPairModel.tokens != null) {
-            return Text("Home page, access token iat: ${jwtPairModel.tokens!.accessToken.body.iat}", textAlign: TextAlign.center);
-          } else {
-            return const Text("Home page", textAlign: TextAlign.center);
-          }
-        });
+    return Consumer<JwtPairModel>(builder: (BuildContext context, JwtPairModel jwtPairModel, child) {
+      if (jwtPairModel.tokens != null) {
+        return Text("""Home page, permissions: ${jwtPairModel.tokens!.accessToken.body.permissionLevel}, 
+            access token iat: ${jwtPairModel.tokens!.accessToken.body.iat}""", textAlign: TextAlign.center);
+      } else {
+        return const Text("Home page", textAlign: TextAlign.center);
+      }
+    });
   }
 }
 

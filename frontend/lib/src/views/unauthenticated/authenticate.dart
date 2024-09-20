@@ -2,7 +2,6 @@ import 'package:Rybocheck/src/utils/jwt.dart';
 import 'package:Rybocheck/src/utils/network.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:Rybocheck/src/components/text_switch.dart';
@@ -33,6 +32,7 @@ class _AuthenticateState extends State<Authenticate> {
       autocorrect: false,
       decoration: InputDecoration(labelText: AppLocalizations.of(context)!.loginUsernamePlaceholder),
       validator: (value) {
+        // TODO: add validation
         if (value == null || value.isEmpty) {
           return AppLocalizations.of(context)!.loginUsernameValidation;
         }
@@ -47,6 +47,7 @@ class _AuthenticateState extends State<Authenticate> {
       controller: _passwordController,
       obscureText: true,
       validator: (value) {
+        // TODO: add validation
         if (value == null || value.isEmpty) {
           return AppLocalizations.of(context)!.loginPasswordValidation;
         }
@@ -76,9 +77,6 @@ class _AuthenticateState extends State<Authenticate> {
             response = await register(username, password);
           }
           if (response.status == "success") {
-            const storage = FlutterSecureStorage();
-            await storage.write(key: 'accessToken', value: response.responseBody!.accessToken.string);
-            await storage.write(key: 'refreshToken', value: response.responseBody!.refreshToken.string);
             jwtPairModel.setTokens(response.responseBody);
           } else if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -120,6 +118,7 @@ class _AuthenticateState extends State<Authenticate> {
                       ],
                     ),
                   )
+                  // TODO: add email, phone, password warning etc
                 : Form(
                     key: _registerFormKey,
                     child: Column(

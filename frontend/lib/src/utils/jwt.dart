@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:argon2/argon2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class JwtHeader {
   final String tokenType;
@@ -136,6 +137,13 @@ class JwtPair {
       _ => throw const FormatException('Failed to parse tokens.'),
     };
   }
+
+  factory JwtPair.fromString(String accessTokenString, String refreshTokenString) {
+    return JwtPair(
+      accessToken: Jwt.fromString(accessTokenString),
+      refreshToken: Jwt.fromString(refreshTokenString),
+    );
+  }
 }
 
 const type = Argon2Parameters.ARGON2_id;
@@ -147,12 +155,31 @@ const hashLength = 32;
 class JwtPairModel extends ChangeNotifier {
   JwtPair? _tokens;
 
+  JwtPairModel() {
+    _setFromStorage();
+  }
+
   JwtPair? get tokens => _tokens;
 
-  void setTokens(JwtPair? tokens) {
-    print("swapping out tokens");
-    print("old tokens: ${_tokens == null ? "null" : _tokens!.accessToken.body.iat}");
-    print("new tokens: ${tokens == null ? "null" : tokens.accessToken.body.iat}");
+  // TODO: include loader of some sort while waiting for storage.read or Roles.unauthenticated
+  Future<void> _setFromStorage() async {
+    const storage = FlutterSecureStorage();
+    String? accessTokenString = await storage.read(key: 'accessToken');
+    String? refreshTokenString = await storage.read(key: 'refreshToken');
+    if (accessTokenString == null || refreshTokenString == null) return;
+    _tokens = JwtPair.fromString(accessTokenString, refreshTokenString);
+    notifyListeners();
+  }
+
+  void setTokens(JwtPair? tokens) async {
+    const storage = FlutterSecureStorage();
+    if (tokens != null) {
+      await storage.write(key: 'accessToken', value: tokens.accessToken.string);
+      await storage.write(key: 'refreshToken', value: tokens.refreshToken.string);
+    } else {
+      await storage.write(key: 'accessToken', value: null);
+      await storage.write(key: 'refreshToken', value: null);
+    }
     _tokens = tokens;
     notifyListeners();
   }
