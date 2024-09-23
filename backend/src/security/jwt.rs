@@ -72,6 +72,7 @@ impl Jwt {
         format!("{header}.{body}.{signature}")
     }
 
+    // TODO: check if the token is still valid (iat, exp)
     pub fn check_if_valid(jwt_token: String) -> Result<bool, Error> {
         let server_secret = env::var("SERVER_SECRET").expect("SERVER_SECRET environment variable is not set");
 

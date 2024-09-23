@@ -183,6 +183,14 @@ class JwtPairModel extends ChangeNotifier {
     _tokens = tokens;
     notifyListeners();
   }
+
+  void eraseTokens() async {
+    const storage = FlutterSecureStorage();
+    await storage.write(key: 'accessToken', value: null);
+    await storage.write(key: 'refreshToken', value: null);
+    _tokens = null;
+    notifyListeners();
+  }
 }
 
 String hashPassword(String username, String password) {

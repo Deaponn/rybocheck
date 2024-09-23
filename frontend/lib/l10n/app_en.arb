@@ -29,5 +29,7 @@
     "loginConfirmPasswordValidation": "Please confirm your password",
     "loginPasswordsDontMatch": "Passwords do not match",
     "loginUsernamePlaceholder": "username...",
-    "loginPasswordPlaceholder": "password..."
+    "loginPasswordPlaceholder": "password...",
+
+    "profileLogout": "Logout"
 }

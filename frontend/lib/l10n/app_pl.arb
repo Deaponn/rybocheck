@@ -29,5 +29,7 @@
     "loginConfirmPasswordValidation": "Proszę powtórzyć hasło",
     "loginPasswordsDontMatch": "Hasła nie są takie same",
     "loginUsernamePlaceholder": "login...",
-    "loginPasswordPlaceholder": "hasło..."
+    "loginPasswordPlaceholder": "hasło...",
+
+    "profileLogout": "Wyloguj"
 }

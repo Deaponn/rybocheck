@@ -10,6 +10,9 @@ import 'package:Rybocheck/src/utils/jwt.dart';
 
 const pingPongDuration = 3;
 
+// TODO: for entire file: if server is unreachable exception Unhandled Exception: ClientException is thrown
+//  and no error is logged to the user
+
 // TODO: change status from String to enum
 class ServerResponse<T> {
   final String status;
