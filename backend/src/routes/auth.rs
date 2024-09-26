@@ -91,7 +91,7 @@ pub async fn login(data: web::Data<AppState>, request: web::Json<LoginRequest>) 
     Ok(HttpResponse::Ok().body(response))
 }
 
-// TODO: make old refresh_token invalid, use proper Error::UserError::BadRequest
+// TODO: make old refresh_token invalid
 #[post("/refresh")]
 pub async fn refresh(_data: web::Data<AppState>, request: web::Json<RefreshRequest>) -> Result<impl Responder, Error> {
     let refresh_token = &request.refresh_token;

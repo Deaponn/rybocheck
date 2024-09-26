@@ -10,6 +10,7 @@
     "unknownError": "Wystąpił nieznany błąd",
     "badRequest": "Błędne zapytanie do serwera",
     "invalidAuth": "Wystąpił problem, zaloguj się ponownie",
+    "socketException": "Brak połączenia z serwerem",
 
     "navBarHome": "Główna",
     "navBarSearch": "Szukaj",
@@ -18,12 +19,13 @@
     "navBarLogin": "Logowanie",
     "navBarProfile": "Profil",
 
+    "toastLoginPending": "Logowanie...",
+    "toastRegisterPending": "Rejestracja...",
+
     "loginSwitchLogin": "Logowanie",
     "loginSwitchRegister": "Rejestracja",
     "loginLoginButton": "Zaloguj",
     "loginRegisterButton": "Zarejestruj",
-    "loginLoginPendingToast": "Logowanie...",
-    "loginRegisterPendingToast": "Rejestracja...",
     "loginUsernameValidation": "Proszę podać nazwę użytkownika",
     "loginPasswordValidation": "Proszę podać hasło",
     "loginConfirmPasswordValidation": "Proszę powtórzyć hasło",

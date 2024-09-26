@@ -10,8 +10,7 @@ import 'package:Rybocheck/src/utils/jwt.dart';
 
 const pingPongDuration = 3;
 
-// TODO: for entire file: if server is unreachable exception Unhandled Exception: ClientException is thrown
-//  and no error is logged to the user
+// TODO: for entire file: rewrite request functions to extract common parts
 
 // TODO: change status from String to enum
 class ServerResponse<T> {
@@ -71,6 +70,8 @@ Future<ServerResponse<T>> getRequestNoAuth<T>(String path, T Function(Map<String
   try {
     final response = await http.get(Uri.parse('http://$apiUrl/$path'));
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
+  } on SocketException {
+    return const ServerResponse('error', null, 'socketException');
   } catch (err) {
     rethrow;
   }
@@ -78,9 +79,9 @@ Future<ServerResponse<T>> getRequestNoAuth<T>(String path, T Function(Map<String
 
 Future<ServerResponse<T>> getRequest<T>(String path, T Function(Map<String, dynamic>) responseConstructor) async {
   final String apiUrl = dotenv.env['API_URL']!;
-  final validTokens = await getValidTokens();
-  if (validTokens.status == 'error') return validTokens as ServerResponse<T>;
   try {
+    final validTokens = await getValidTokens();
+    if (validTokens.status == 'error') return validTokens as ServerResponse<T>;
     final response = await http.get(
       Uri.parse('http://$apiUrl/$path'),
       headers: {
@@ -88,6 +89,8 @@ Future<ServerResponse<T>> getRequest<T>(String path, T Function(Map<String, dyna
       },
     );
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
+  } on SocketException {
+    return const ServerResponse('error', null, 'socketException');
   } catch (err) {
     rethrow;
   }
@@ -100,6 +103,8 @@ Future<ServerResponse<T>> postRequestNoAuth<T>(
     final response = await http.post(Uri.parse('http://$apiUrl/$path'),
         body: jsonEncode(body), headers: {HttpHeaders.contentTypeHeader: "application/json"});
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
+  } on SocketException {
+    return const ServerResponse('error', null, 'socketException');
   } catch (err) {
     rethrow;
   }
@@ -108,14 +113,16 @@ Future<ServerResponse<T>> postRequestNoAuth<T>(
 Future<ServerResponse<T>> postRequest<T>(
     String path, Object body, T Function(Map<String, dynamic>) responseConstructor) async {
   final String apiUrl = dotenv.env['API_URL']!;
-  final validTokens = await getValidTokens();
-  if (validTokens.status == 'error') return validTokens as ServerResponse<T>;
   try {
+    final validTokens = await getValidTokens();
+    if (validTokens.status == 'error') return validTokens as ServerResponse<T>;
     final response = await http.post(Uri.parse('http://$apiUrl/$path'), body: jsonEncode(body), headers: {
       HttpHeaders.authorizationHeader: 'Bearer ${validTokens.responseBody!.accessToken.string}',
       HttpHeaders.contentTypeHeader: "application/json"
     });
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
+  } on SocketException {
+    return const ServerResponse('error', null, 'socketException');
   } catch (err) {
     rethrow;
   }
@@ -153,6 +160,8 @@ String localizeErrorResponse(String key, BuildContext context) {
       return AppLocalizations.of(context)!.unauthenticated;
     case "unauthorized":
       return AppLocalizations.of(context)!.unauthorized;
+    case "socketException":
+      return AppLocalizations.of(context)!.socketException;
     default:
       return AppLocalizations.of(context)!.unknownError;
   }

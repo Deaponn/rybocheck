@@ -66,8 +66,8 @@ class _AuthenticateState extends State<Authenticate> {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 content: Text(action == SubmitAction.login
-                    ? AppLocalizations.of(context)!.loginLoginPendingToast
-                    : AppLocalizations.of(context)!.loginRegisterPendingToast)),
+                    ? AppLocalizations.of(context)!.toastLoginPending
+                    : AppLocalizations.of(context)!.toastRegisterPending)),
           );
           action == SubmitAction.login ? _loginFormKey.currentState!.save() : _registerFormKey.currentState!.save();
           ServerResponse<JwtPair> response;
@@ -76,16 +76,19 @@ class _AuthenticateState extends State<Authenticate> {
           } else {
             response = await register(username, password);
           }
-          if (response.status == "success") {
-            jwtPairModel.setTokens(response.responseBody);
-          } else if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              content: Text(localizeErrorResponse(response.error!, context)),
-            ));
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).clearSnackBars();
+            if (response.status == "success") {
+              jwtPairModel.setTokens(response.responseBody);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                content: Text(localizeErrorResponse(response.error!, context)),
+              ));
+            }
           }
         }
       };
@@ -118,7 +121,7 @@ class _AuthenticateState extends State<Authenticate> {
                       ],
                     ),
                   )
-                  // TODO: add email, phone, password warning etc
+                // TODO: add email, phone, password warning etc
                 : Form(
                     key: _registerFormKey,
                     child: Column(
