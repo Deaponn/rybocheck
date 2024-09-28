@@ -33,5 +33,10 @@
     "loginUsernamePlaceholder": "login...",
     "loginPasswordPlaceholder": "hasło...",
 
+    "newPostTitlePlaceholder": "tytuł...",
+    "newPostTitleValidation": "Proszę podać tytuł wpisu",
+    "newPostDescriptionPlaceholder": "opis...",
+    "newPostCreatePost": "Utwórz wpis",
+
     "profileLogout": "Wyloguj"
 }

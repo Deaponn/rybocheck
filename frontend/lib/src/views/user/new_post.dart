@@ -1,12 +1,65 @@
+import 'package:Rybocheck/src/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class NewPost extends StatelessWidget {
+class NewPost extends StatefulWidget {
   const NewPost({super.key});
 
   @override
+  State<NewPost> createState() => _NewPostState();
+}
+
+class _NewPostState extends State<NewPost> {
+  final _formKey = GlobalKey<FormState>();
+  final titleController = TextEditingController();
+  final descriptionController = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
-    return const Text("NewPost page", textAlign: TextAlign.center);
+    return Column(
+      children: [
+        const Text("NewPost page", textAlign: TextAlign.center),
+        Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              TextFormField(
+                controller: titleController,
+                autocorrect: false,
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.newPostTitlePlaceholder),
+                validator: (value) {
+                  // TODO: add validation
+                  if (value == null || value.isEmpty) {
+                    return AppLocalizations.of(context)!.newPostTitleValidation;
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: descriptionController,
+                autocorrect: false,
+                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.newPostDescriptionPlaceholder),
+                // TODO: add validation or leave it without?
+                // validator: (value) {
+                //   if (value == null || value.isEmpty) {
+                //     return AppLocalizations.of(context)!.loginUsernameValidation;
+                //   }
+                //   return null;
+                // },
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (!_formKey.currentState!.validate()) return;
+                  showToast(context, Text("${titleController.text} ${descriptionController.text}"));
+                },
+                child: Text(AppLocalizations.of(context)!.newPostCreatePost),
+              ),
+            ],
+          ),
+        )
+      ],
+    );
   }
 }
 

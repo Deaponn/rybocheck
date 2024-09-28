@@ -1,5 +1,6 @@
 import 'package:Rybocheck/src/utils/jwt.dart';
 import 'package:Rybocheck/src/utils/network.dart';
+import 'package:Rybocheck/src/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -59,16 +60,11 @@ class _AuthenticateState extends State<Authenticate> {
       return () async {
         if ((action == SubmitAction.login && _loginFormKey.currentState!.validate()) ||
             (action == SubmitAction.register && _registerFormKey.currentState!.validate())) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                content: Text(action == SubmitAction.login
-                    ? AppLocalizations.of(context)!.toastLoginPending
-                    : AppLocalizations.of(context)!.toastRegisterPending)),
-          );
+          showToast(
+              context,
+              Text(action == SubmitAction.login
+                  ? AppLocalizations.of(context)!.toastLoginPending
+                  : AppLocalizations.of(context)!.toastRegisterPending));
           action == SubmitAction.login ? _loginFormKey.currentState!.save() : _registerFormKey.currentState!.save();
           ServerResponse<JwtPair> response;
           if (action == SubmitAction.login) {
@@ -77,17 +73,11 @@ class _AuthenticateState extends State<Authenticate> {
             response = await register(username, password);
           }
           if (context.mounted) {
-            ScaffoldMessenger.of(context).clearSnackBars();
+            clearToast(context);
             if (response.status == "success") {
               jwtPairModel.setTokens(response.responseBody);
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                content: Text(localizeErrorResponse(response.error!, context)),
-              ));
+              showToast(context, Text(localizeErrorResponse(response.error!, context)));
             }
           }
         }
