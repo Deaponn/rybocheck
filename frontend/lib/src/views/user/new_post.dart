@@ -12,8 +12,9 @@ class NewPost extends StatefulWidget {
 
 class _NewPostState extends State<NewPost> {
   final _formKey = GlobalKey<FormState>();
-  final titleController = TextEditingController();
-  final descriptionController = TextEditingController();
+  // TODO: run .dispose() somewhere
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class _NewPostState extends State<NewPost> {
           child: Column(
             children: <Widget>[
               TextFormField(
-                controller: titleController,
+                controller: _titleController,
                 autocorrect: false,
                 decoration: InputDecoration(labelText: AppLocalizations.of(context)!.newPostTitlePlaceholder),
                 validator: (value) {
@@ -37,7 +38,7 @@ class _NewPostState extends State<NewPost> {
                 },
               ),
               TextFormField(
-                controller: descriptionController,
+                controller: _descriptionController,
                 autocorrect: false,
                 decoration: InputDecoration(labelText: AppLocalizations.of(context)!.newPostDescriptionPlaceholder),
                 // TODO: add validation or leave it without?
@@ -51,7 +52,7 @@ class _NewPostState extends State<NewPost> {
               ElevatedButton(
                 onPressed: () {
                   if (!_formKey.currentState!.validate()) return;
-                  showToast(context, Text("${titleController.text} ${descriptionController.text}"));
+                  showToast(context, Text("${_titleController.text} ${_descriptionController.text}"));
                 },
                 child: Text(AppLocalizations.of(context)!.newPostCreatePost),
               ),

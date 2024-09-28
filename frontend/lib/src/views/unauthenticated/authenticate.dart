@@ -21,36 +21,38 @@ class _AuthenticateState extends State<Authenticate> {
   int _loginRegisterChoice = 0;
   final _loginFormKey = GlobalKey<FormState>();
   final _registerFormKey = GlobalKey<FormState>();
+  // TODO: run .dispose() somewhere
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    String username = "";
-    String password = "";
-
     final usernameField = TextFormField(
-      onSaved: (value) => username = value!,
       autocorrect: false,
       decoration: InputDecoration(labelText: AppLocalizations.of(context)!.loginUsernamePlaceholder),
+      controller: _usernameController,
       validator: (value) {
-        // TODO: add validation
         if (value == null || value.isEmpty) {
-          return AppLocalizations.of(context)!.loginUsernameValidation;
+          return AppLocalizations.of(context)!.loginUsernameEmpty;
+        }
+        if (value.length <= 2) {
+          return AppLocalizations.of(context)!.loginUsernameTooShort;
         }
         return null;
       },
     );
 
     final passwordField = TextFormField(
-      onSaved: (value) => password = value!,
       autocorrect: false,
       decoration: InputDecoration(labelText: AppLocalizations.of(context)!.loginPasswordPlaceholder),
       controller: _passwordController,
       obscureText: true,
       validator: (value) {
-        // TODO: add validation
         if (value == null || value.isEmpty) {
-          return AppLocalizations.of(context)!.loginPasswordValidation;
+          return AppLocalizations.of(context)!.loginPasswordEmpty;
+        }
+        if (value.length <= 5) {
+          return AppLocalizations.of(context)!.loginPasswordTooShort;
         }
         return null;
       },
@@ -68,9 +70,9 @@ class _AuthenticateState extends State<Authenticate> {
           action == SubmitAction.login ? _loginFormKey.currentState!.save() : _registerFormKey.currentState!.save();
           ServerResponse<JwtPair> response;
           if (action == SubmitAction.login) {
-            response = await login(username, password);
+            response = await login(_usernameController.text, _passwordController.text);
           } else {
-            response = await register(username, password);
+            response = await register(_usernameController.text, _passwordController.text);
           }
           if (context.mounted) {
             clearToast(context);
@@ -125,7 +127,7 @@ class _AuthenticateState extends State<Authenticate> {
                           obscureText: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return AppLocalizations.of(context)!.loginConfirmPasswordValidation;
+                              return AppLocalizations.of(context)!.loginConfirmPasswordEmpty;
                             }
                             if (value != _passwordController.value.text) {
                               return AppLocalizations.of(context)!.loginPasswordsDontMatch;
