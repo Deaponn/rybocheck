@@ -12,9 +12,15 @@ class NewPost extends StatefulWidget {
 
 class _NewPostState extends State<NewPost> {
   final _formKey = GlobalKey<FormState>();
-  // TODO: run .dispose() somewhere
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

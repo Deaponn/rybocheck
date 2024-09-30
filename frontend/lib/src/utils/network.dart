@@ -12,9 +12,17 @@ const pingPongDuration = 3;
 
 // TODO: for entire file: rewrite request functions to extract common parts
 
-// TODO: change status from String to enum
+enum ResponseStatus {
+  success,
+  error;
+
+  static ResponseStatus fromString(String status) {
+    return switch (status.toLowerCase()) { 'success' => ResponseStatus.success, _ => ResponseStatus.error };
+  }
+}
+
 class ServerResponse<T> {
-  final String status;
+  final ResponseStatus status;
   final T? responseBody;
   final String? error;
 
@@ -30,8 +38,9 @@ class ServerResponse<T> {
   factory ServerResponse.fromJson(Map<String, dynamic> jsonBody, T Function(Map<String, dynamic>) responseConstructor) {
     return switch (jsonBody) {
       {'status': String status, 'body': Map<String, dynamic> body} =>
-        ServerResponse(status, responseConstructor(body), null),
-      {'status': String status, 'error': String error} => ServerResponse(status, null, error),
+        ServerResponse(ResponseStatus.fromString(status), responseConstructor(body), null),
+      {'status': String status, 'error': String error} =>
+        ServerResponse(ResponseStatus.fromString(status), null, error),
       _ => throw const FormatException('Failed to parse response body.'),
     };
   }
@@ -45,13 +54,13 @@ Future<ServerResponse<JwtPair>> getValidTokens() async {
   final accessTokenString = await storage.read(key: 'accessToken');
   final refreshTokenString = await storage.read(key: 'refreshToken');
   if (accessTokenString == null || refreshTokenString == null) {
-    return const ServerResponse('error', null, 'invalidAuth');
+    return const ServerResponse(ResponseStatus.error, null, 'invalidAuth');
   }
   final accessToken = Jwt.fromString(accessTokenString);
   final refreshToken = Jwt.fromString(refreshTokenString);
   final currentSeconds = DateTime.now().millisecondsSinceEpoch / 1000;
   if (accessToken.body.exp! >= currentSeconds + pingPongDuration) {
-    return ServerResponse('success', JwtPair(accessToken: accessToken, refreshToken: refreshToken), null);
+    return ServerResponse(ResponseStatus.success, JwtPair(accessToken: accessToken, refreshToken: refreshToken), null);
   }
   final newTokens = await http.post(Uri.parse('http://$apiUrl/refresh'),
       body: jsonEncode({'refreshToken': refreshToken}),
@@ -60,9 +69,9 @@ Future<ServerResponse<JwtPair>> getValidTokens() async {
         HttpHeaders.contentTypeHeader: "application/json"
       });
   if (newTokens.statusCode != 200) {
-    return ServerResponse('error', null, ServerResponse.errorFromBody(jsonDecode(newTokens.body)));
+    return ServerResponse(ResponseStatus.error, null, ServerResponse.errorFromBody(jsonDecode(newTokens.body)));
   }
-  return ServerResponse('success', JwtPair.fromJson(jsonDecode(newTokens.body)), null);
+  return ServerResponse(ResponseStatus.success, JwtPair.fromJson(jsonDecode(newTokens.body)), null);
 }
 
 Future<ServerResponse<T>> getRequestNoAuth<T>(String path, T Function(Map<String, dynamic>) responseConstructor) async {
@@ -71,7 +80,7 @@ Future<ServerResponse<T>> getRequestNoAuth<T>(String path, T Function(Map<String
     final response = await http.get(Uri.parse('http://$apiUrl/$path'));
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
   } on SocketException {
-    return const ServerResponse('error', null, 'socketException');
+    return const ServerResponse(ResponseStatus.error, null, 'socketException');
   } catch (err) {
     rethrow;
   }
@@ -81,7 +90,7 @@ Future<ServerResponse<T>> getRequest<T>(String path, T Function(Map<String, dyna
   final String apiUrl = dotenv.env['API_URL']!;
   try {
     final validTokens = await getValidTokens();
-    if (validTokens.status == 'error') return validTokens as ServerResponse<T>;
+    if (validTokens.status == ResponseStatus.error) return validTokens as ServerResponse<T>;
     final response = await http.get(
       Uri.parse('http://$apiUrl/$path'),
       headers: {
@@ -90,7 +99,7 @@ Future<ServerResponse<T>> getRequest<T>(String path, T Function(Map<String, dyna
     );
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
   } on SocketException {
-    return const ServerResponse('error', null, 'socketException');
+    return const ServerResponse(ResponseStatus.error, null, 'socketException');
   } catch (err) {
     rethrow;
   }
@@ -104,7 +113,7 @@ Future<ServerResponse<T>> postRequestNoAuth<T>(
         body: jsonEncode(body), headers: {HttpHeaders.contentTypeHeader: "application/json"});
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
   } on SocketException {
-    return const ServerResponse('error', null, 'socketException');
+    return const ServerResponse(ResponseStatus.error, null, 'socketException');
   } catch (err) {
     rethrow;
   }
@@ -115,14 +124,14 @@ Future<ServerResponse<T>> postRequest<T>(
   final String apiUrl = dotenv.env['API_URL']!;
   try {
     final validTokens = await getValidTokens();
-    if (validTokens.status == 'error') return validTokens as ServerResponse<T>;
+    if (validTokens.status == ResponseStatus.error) return validTokens as ServerResponse<T>;
     final response = await http.post(Uri.parse('http://$apiUrl/$path'), body: jsonEncode(body), headers: {
       HttpHeaders.authorizationHeader: 'Bearer ${validTokens.responseBody!.accessToken.string}',
       HttpHeaders.contentTypeHeader: "application/json"
     });
     return ServerResponse.fromJson(jsonDecode(response.body), responseConstructor);
   } on SocketException {
-    return const ServerResponse('error', null, 'socketException');
+    return const ServerResponse(ResponseStatus.error, null, 'socketException');
   } catch (err) {
     rethrow;
   }
